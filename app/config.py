@@ -12,8 +12,12 @@ os.environ.setdefault("GOOGLE_GENAI_USE_ENTERPRISE", "True")
 os.environ.setdefault("GOOGLE_CLOUD_LOCATION", LOCATION)
 
 # Fast multimodal model for document reading; reasoning model for the analyst agents.
-MODEL_INTAKE = os.getenv("CT_MODEL_INTAKE", "gemini-3-flash-preview")
-MODEL_REASON = os.getenv("CT_MODEL_REASON", "gemini-3-flash-preview")
+MODEL_INTAKE = os.getenv("CT_MODEL_INTAKE", "gemini-3.8-flash")
+MODEL_REASON = os.getenv("CT_MODEL_REASON", "gemini-3.8-flash")
+# Gemini 3 thinking level for the agents (MINIMAL, LOW, MEDIUM, HIGH). Empty = model default + temperature.
+THINKING_LEVEL = os.getenv("CT_THINKING_LEVEL", "LOW")
+# Intake thinking level; LOW reads the demo register correctly in about a third of the time. Empty = model default.
+THINKING_LEVEL_INTAKE = os.getenv("CT_THINKING_LEVEL_INTAKE", "LOW")
 
 GCS_BUCKET = os.getenv("CT_GCS_BUCKET", "")          # optional: store uploaded documents
 USE_FIRESTORE = os.getenv("CT_FIRESTORE", "0") == "1"  # optional: persist run results
@@ -23,4 +27,4 @@ USE_FIRESTORE = os.getenv("CT_FIRESTORE", "0") == "1"  # optional: persist run r
 ALLOW_SAMPLE_REPLAY = os.getenv("CT_ALLOW_SAMPLE_REPLAY", "1") == "1"
 
 MAX_UPLOAD_MB = int(os.getenv("CT_MAX_UPLOAD_MB", "15"))
-INTAKE_CONCURRENCY = int(os.getenv("CT_INTAKE_CONCURRENCY", "4"))
+INTAKE_CONCURRENCY = int(os.getenv("CT_INTAKE_CONCURRENCY", "10"))

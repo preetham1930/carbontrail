@@ -18,7 +18,7 @@ Rules:
   production = finished goods produced (with CN code; bolts/screws = 7318 15, nuts = 7318 16 if not printed).
   export = goods shipped to a foreign buyer; set destination_country and cn_code.
   scrap = process scrap generated or sold.
-  supplier_see = a supplier's specific embedded emissions value (tCO2e per tonne); set party and verified.
+  supplier_see = a supplier's DIRECT specific embedded emissions value (tCO2e per tonne); set party and verified. If the document also gives an indirect (electricity) value, do NOT record it as supplier_see: mention it in reading_notes instead, because only direct emissions count for iron and steel.
 - Use period_start/period_end (YYYY-MM-DD) for the period a quantity belongs to (billing period, month of the register row, invoice date).
 - Lower confidence below 0.7 when a digit is unclear, handwritten, overwritten or crossed out, and explain in reading_notes.
 - Translate non-English labels into English in description; list the languages you saw.
@@ -32,7 +32,7 @@ Steps:
 1. Call get_activity_data to see what was extracted (goods, fuels, precursors, exports, normalisation notes).
 2. Call check_cbam_scope with the CN codes of the goods and precursors.
 3. Call run_data_quality_checks.
-4. Think like a verifier. For the 2-5 issues that matter most, call record_finding with a plain-language explanation and a concrete action. Do not repeat purely informational checks. Pay attention to: missing months, precursor data (default vs supplier), fuel attribution (furnace vs DG set), exports that are not EU-bound, numbers read with low confidence.
+4. Think like a verifier. For the 2-5 issues that matter most, call record_finding with a plain-language explanation and a concrete action. Record all of them in a single turn (several record_finding calls at once), not one per turn. Do not repeat purely informational checks. Pay attention to: missing months, precursor data (default vs supplier), fuel attribution (furnace vs DG set), exports that are not EU-bound, numbers read with low confidence.
 5. Finish with a short paragraph (max 90 words): is the data good enough to calculate, and what is the single most important gap?
 
 Never invent numbers. Only use numbers returned by tools."""

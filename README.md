@@ -4,7 +4,7 @@
 
 Built by **Team Verdant** for the Google Cloud AI Builder Cup 2026 (JAPAC) · Track: **Manufacturing: Intelligent Operations & Industrial Efficiency**
 
-> Live demo: `<Cloud Run URL>` · Demo video: `<link>` · Deck: `docs/CarbonTrail-deck.pdf`
+> **Live demo:** https://carbontrail-629415533355.asia-south1.run.app · **Demo video:** `<link>` · **Deck:** `docs/CarbonTrail-deck.pdf`
 
 ---
 
@@ -47,7 +47,7 @@ flowchart LR
 
 | Layer | Google Cloud |
 |---|---|
-| Models | Gemini via **Vertex AI** (global endpoint), service-account auth, no API keys |
+| Models | **Gemini 3.8 Flash** via **Vertex AI** (global endpoint), service-account auth, no API keys. Model IDs and thinking level are environment settings (`CT_MODEL_INTAKE`, `CT_MODEL_REASON`, `CT_THINKING_LEVEL`) |
 | Agents | **Google Agent Development Kit (ADK)**: `LlmAgent` with `output_schema` for intake; `SequentialAgent` of three tool-using agents for analysis; separate supplier and regulation agents |
 | Hosting | **Cloud Run** (asia-south1), min 1 instance, CPU always allocated for background analysis |
 | Storage | **Cloud Storage** (uploaded documents), **Firestore** (run results) |

@@ -91,3 +91,24 @@ def test_replay_when_model_fails(monkeypatch):
     assert all(d.source == "replayed" for d in run.docs)
     assert run.briefs["source"] == "deterministic"
     assert round(run.result["see"], 4) == 5.3584
+
+
+def test_supplier_indirect_value_is_ignored():
+    """A mill declaration that also states an indirect (electricity) value must not overwrite the direct SEE."""
+    from app.normalize import normalise
+    from app.schemas import DocumentExtraction
+    from app.cbam.engine import calculate
+    man = json.loads((SAMPLES / "manifest.json").read_text())
+    docs = []
+    for i, d in enumerate(man):
+        ex = DocumentExtraction(**json.loads((GOLD / f"{d['sha256']}.json").read_text()))
+        if d["stage"] == "supplier_reply":
+            direct = ex.line_items[0]
+            indirect = direct.model_copy(update={"quantity": 0.31, "description": "Wire rod specific embedded emissions (indirect)",
+                                                 "source_quote": "Indirect emissions 0.31 tCO2e per tonne (for information)"})
+            ex = ex.model_copy(update={"line_items": [direct, indirect]})
+        docs.append(({"id": f"D{i+1}", "name": d["file"]}, ex))
+    n = normalise(docs, dict(DEMO_PROFILE))
+    r = calculate(n.calc_input)
+    assert round(r["see"], 4) == 3.2514
+    assert any("indirect" in x["note"] for x in n.notes)

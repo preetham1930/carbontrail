@@ -13,6 +13,16 @@ from google.genai import types
 Emit = Callable[[dict], Awaitable[None]]
 
 
+def _args(d: dict, n: int = 140) -> dict:
+    """Readable tool-call arguments for the live trace: trim long string values, keep the structure."""
+    out = {}
+    for k, v in d.items():
+        if isinstance(v, str) and len(v) > n:
+            v = v[:n] + "…"
+        out[k] = _short(v, 300)
+    return out
+
+
 def _short(v: Any, n: int = 400) -> Any:
     try:
         s = json.dumps(v, default=str)
@@ -39,7 +49,7 @@ async def run_agent(agent, parts: list[types.Part], emit: Optional[Emit] = None,
             continue
         for fc in ev.get_function_calls() or []:
             if emit:
-                await emit({"type": "tool_call", "agent": author, "tool": fc.name, "args": _short(dict(fc.args or {}), 300), "label": label})
+                await emit({"type": "tool_call", "agent": author, "tool": fc.name, "args": _args(dict(fc.args or {})), "label": label})
         for fr in ev.get_function_responses() or []:
             if emit:
                 await emit({"type": "tool_result", "agent": author, "tool": fr.name, "result": _short(fr.response, 600), "label": label})

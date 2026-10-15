@@ -5,7 +5,7 @@ set -euo pipefail
 PROJECT="${PROJECT:-$(gcloud config get-value project 2>/dev/null)}"
 REGION="${REGION:-asia-south1}"
 SERVICE="${SERVICE:-carbontrail}"
-MODEL_INTAKE="${MODEL_INTAKE:-gemini-3-flash-preview}"
+MODEL_INTAKE="${MODEL_INTAKE:-gemini-3.8-flash}"
 MODEL_REASON="${MODEL_REASON:-$MODEL_INTAKE}"
 MIN_INSTANCES="${MIN_INSTANCES:-1}"
 SA="carbontrail-run@${PROJECT}.iam.gserviceaccount.com"
@@ -22,6 +22,11 @@ gcloud iam service-accounts describe "$SA" >/dev/null 2>&1 || \
 for role in roles/aiplatform.user roles/datastore.user roles/storage.objectAdmin roles/logging.logWriter; do
   gcloud projects add-iam-policy-binding "$PROJECT" --member "serviceAccount:$SA" --role "$role" --condition=None >/dev/null
 done
+
+echo "== Let Cloud Build (default compute service account) build from source"
+PNUM=$(gcloud projects describe "$PROJECT" --format 'value(projectNumber)')
+gcloud projects add-iam-policy-binding "$PROJECT" --member "serviceAccount:${PNUM}-compute@developer.gserviceaccount.com" \
+  --role roles/run.builder --condition=None >/dev/null
 
 echo "== Cloud Storage bucket for uploaded documents"
 gcloud storage buckets describe "gs://$BUCKET" >/dev/null 2>&1 || \

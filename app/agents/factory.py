@@ -31,8 +31,15 @@ MODEL_OVERRIDE = None  # tests inject a scripted model here
 _KNOWLEDGE = (Path(__file__).resolve().parent.parent / "cbam" / "data" / "knowledge.md").read_text()
 
 
-def _cfg(temperature: float = 0.2, json_mode: bool = False) -> types.GenerateContentConfig:
-    kw: dict[str, Any] = {"temperature": temperature}
+def _cfg(temperature: float = 0.2, json_mode: bool = False, thinking: str | None = None) -> types.GenerateContentConfig:
+    kw: dict[str, Any] = {}
+    level = (config.THINKING_LEVEL if thinking is None else thinking).upper()
+    if level in ("MINIMAL", "LOW", "MEDIUM", "HIGH"):
+        # Gemini 3 models: control latency with the thinking level and keep the default temperature (1.0),
+        # which Google recommends for Gemini 3; lower values can cause loops in tool use.
+        kw["thinking_config"] = types.ThinkingConfig(thinking_level=getattr(types.ThinkingLevel, level))
+    else:
+        kw["temperature"] = temperature
     if json_mode:
         kw["response_mime_type"] = "application/json"
     return types.GenerateContentConfig(**kw)
@@ -53,7 +60,7 @@ def build_intake_agent(model=None) -> LlmAgent:
         instruction=_static(prompts.INTAKE),
         output_schema=DocumentExtraction,
         output_key="extraction",
-        generate_content_config=_cfg(0.0),
+        generate_content_config=_cfg(0.0, thinking=config.THINKING_LEVEL_INTAKE),
     )
 
 

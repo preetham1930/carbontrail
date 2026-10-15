@@ -222,9 +222,9 @@ def normalise(docs: list[tuple[dict, DocumentExtraction]], profile: dict) -> Nor
             notes.append({"doc": "-", "note": f"No consumption figure for precursor {cn}; using purchases ({t:.3f} t) as a proxy. Stock changes are ignored."})
         supplier = purchases.get(cn, {}).get("supplier", "")
         p = PrecursorInput(id=f"P{cn}", cn=cn, description=desc or "Wire rod", consumed_t=round(t, 6), supplier=supplier, evidence=ev)
-        for it, eid in supplier_see:
+        for it, eid in _direct_first(supplier_see, notes, evidence):
             cn_ok = normalise_cn(it.cn_code or cn)[:4] == cn
-            if cn_ok and it.quantity is not None:
+            if cn_ok and it.quantity is not None and p.see_actual is None:
                 p.see_actual = float(it.quantity)
                 p.see_actual_verified = bool(it.verified)
                 p.see_evidence = [eid]
@@ -248,3 +248,20 @@ def normalise(docs: list[tuple[dict, DocumentExtraction]], profile: dict) -> Nor
     out.notes = notes
     out.exports_non_eu = exports_non_eu
     return out
+
+
+def _is_indirect(it: LineItem) -> bool:
+    text = f"{it.description or ''} {it.source_quote or ''}".lower()
+    return "indirect" in text
+
+
+def _direct_first(items: list, notes: list, evidence: dict) -> list:
+    """Supplier SEE values: drop indirect (electricity) values, which do not count for iron & steel, and
+    put values explicitly labelled 'direct' first so the first match per precursor is the right one."""
+    kept = []
+    for it, eid in items:
+        if _is_indirect(it):
+            notes.append({"doc": evidence[eid].doc_name, "note": f"Ignored supplier value {it.quantity} {it.unit or ''}: it is an indirect (electricity) figure, and only direct emissions count for iron & steel."})
+        else:
+            kept.append((it, eid))
+    return sorted(kept, key=lambda x: 0 if "direct" in f"{x[0].description or ''} {x[0].source_quote or ''}".lower() else 1)

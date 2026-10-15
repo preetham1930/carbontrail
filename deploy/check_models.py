@@ -5,7 +5,7 @@ from google import genai
 project = os.environ.get("GOOGLE_CLOUD_PROJECT") or sys.argv[1]
 client = genai.Client(vertexai=True, project=project, location="global")
 ok = []
-for m in ["gemini-3-flash-preview", "gemini-3.1-flash-preview", "gemini-3.1-pro-preview", "gemini-3-pro-preview",
+for m in sys.argv[2:] + ["gemini-3-flash-preview", "gemini-3.1-flash-preview", "gemini-3.1-pro-preview", "gemini-3-pro-preview",
           "gemini-flash-latest", "gemini-2.5-flash", "gemini-2.5-pro"]:
     try:
         r = client.models.generate_content(model=m, contents="Reply with the single word OK.")
