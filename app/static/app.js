@@ -22,13 +22,13 @@ const DOC_TYPES = {
 const S = { runId: null, run: null, es: null, seen: 0, docs: {}, scenTimer: null, scen: null };
 
 /* ---------- start ---------- */
-$("#run-demo").addEventListener("click", () => start({ useSamples: true }));
+$$("[data-run-demo]").forEach((b) => b.addEventListener("click", () => start({ useSamples: true })));
 $("#file-input").addEventListener("change", (e) => e.target.files.length && start({ files: e.target.files }));
 $("#add-input").addEventListener("change", (e) => e.target.files.length && addDocs({ files: e.target.files }));
 
 async function start({ useSamples = false, files = null }) {
-  const btn = $("#run-demo");
-  btn.disabled = true;
+  const btns = $$("[data-run-demo]");
+  btns.forEach((b) => (b.disabled = true));
   const fd = new FormData();
   fd.append("profile", "{}");
   fd.append("use_samples", useSamples ? "true" : "false");
@@ -41,13 +41,16 @@ async function start({ useSamples = false, files = null }) {
     S.seen = 0;
     $("#landing").hidden = true;
     $("#workspace").hidden = false;
+    document.body.classList.replace("mode-landing", "mode-work");
+    document.dispatchEvent(new Event("ct:workspace"));
     window.scrollTo({ top: 0 });
+    setPhase(0);
     data.documents.forEach(upsertDoc);
     setStatus("Reading your documents", true);
     listen();
   } catch (err) {
     alert("Could not start: " + err.message);
-  } finally { btn.disabled = false; }
+  } finally { btns.forEach((b) => (b.disabled = false)); }
 }
 
 async function addDocs({ files = null, sample = "" }) {
@@ -59,6 +62,7 @@ async function addDocs({ files = null, sample = "" }) {
   const data = await r.json();
   data.documents.forEach(upsertDoc);
   $("#live").hidden = false;
+  setPhase(0);
   setStatus("Reading the new document and updating the figures", true);
   listen();
   return true;
@@ -84,8 +88,9 @@ function onEvent(ev) {
   if (ev.type === "doc_start") upsertDoc({ id: ev.doc, name: ev.name, state: "reading" });
   if (ev.type === "doc_done") upsertDoc({ id: ev.doc, name: ev.name, source: ev.source, doc_type: ev.doc_type, items: ev.items.length, error: ev.error });
   if (ev.type === "stage") setStatus(ev.text, true);
-  if (ev.type === "result") refresh(false);
-  if (ev.type === "done") { setStatus(""); refresh(true); }
+  if (ev.type === "result") { refresh(false); setPhase(2); }
+  if (ev.type === "tool_call" && ev.agent === "advisor_agent") setPhase(3);
+  if (ev.type === "done") { setStatus(""); refresh(true); setPhase(4); }
   if (ev.type === "error") setStatus("Something stopped the analysis: " + ev.text);
 }
 
@@ -115,6 +120,15 @@ function traceItem(ev) {
     case "done": li.className = "tr stage"; li.textContent = "Done."; return li;
   }
   return null;
+}
+
+/* Progress stepper: 0 Read, 1 Calculate, 2 Review, 3 Advise; 4 = all done. */
+function setPhase(n) {
+  $$("#phases li").forEach((li) => {
+    const i = +li.dataset.ph;
+    li.classList.toggle("done", i < n);
+    li.classList.toggle("active", i === n);
+  });
 }
 
 function setStatus(text, busy = false) {
@@ -183,7 +197,7 @@ function renderHeader(r) {
     : `Your figure is above the EU default by ${eur(-sav)}: check the findings before sharing it.`;
   drawRuler(r, S.scen);
   const pPrec = r.breakdown.precursors * 100, pFuel = r.breakdown.process_fuels * 100;
-  $("#split").innerHTML = `<div class="s-prec" style="width:${pPrec}%" title="Purchased wire rod">Wire rod ${pPrec.toFixed(0)}%</div><div class="s-fuel" style="width:${pFuel}%" title="Fuel burned in the furnace">Furnace fuel ${pFuel.toFixed(0)}%</div>`;
+  $("#split").innerHTML = `<div class="s-prec" style="width:${pPrec}%" title="Purchased wire rod">Wire rod ${pPrec.toFixed(0)}%</div><div class="s-fuel" style="width:${pFuel}%" title="Fuel burned in the furnace">${pFuel < 20 && innerWidth < 620 ? "" : "Furnace fuel "}${pFuel.toFixed(0)}%</div>`;
 }
 
 function drawRuler(r, scen) {
@@ -194,10 +208,11 @@ function drawRuler(r, scen) {
   const pos = (v) => `${(v / max) * 100}%`;
   let html = `<div class="track"></div>`;
   for (let t = 0; t <= max; t++) html += `<div class="tick" style="left:${pos(t)}"><span>${t}</span></div>`;
-  html += `<div class="mark actual" style="left:${pos(r.see)}"><b>Your data ${num(r.see, 2)}</b><i></i></div>`;
+  const edge = (v) => (v / max > 0.8 ? " edge-r" : v / max < 0.12 ? " edge-l" : "");
+  html += `<div class="mark actual${edge(r.see)}" style="left:${pos(r.see)}"><b>Your data ${num(r.see, 2)}</b><i></i></div>`;
   const close = def != null && Math.abs(def - r.see) / max < 0.16;
-  if (def != null) html += close ? `<div class="mark default below" style="left:${pos(def)}"><i></i><b>EU default, ${esc(main.description.split(" ")[0].toLowerCase())} ${num(def, 2)}</b></div>` : `<div class="mark default" style="left:${pos(def)}"><b>EU default, ${esc(main.description.split(" ")[0].toLowerCase())} ${num(def, 2)}</b><i></i></div>`;
-  if (scen) html += `<div class="mark scen ${close ? "" : "below"}" style="left:${pos(scen.see)}"><i></i><b>What if ${num(scen.see, 2)}</b></div>`;
+  if (def != null) html += close ? `<div class="mark default below${edge(def)}" style="left:${pos(def)}"><i></i><b>EU default, ${esc(main.description.split(" ")[0].toLowerCase())} ${num(def, 2)}</b></div>` : `<div class="mark default${edge(def)}" style="left:${pos(def)}"><b>EU default, ${esc(main.description.split(" ")[0].toLowerCase())} ${num(def, 2)}</b><i></i></div>`;
+  if (scen) html += `<div class="mark scen ${close ? "" : "below"}${edge(scen.see)}" style="left:${pos(scen.see)}"><i></i><b>What if ${num(scen.see, 2)}</b></div>`;
   $("#ruler").innerHTML = html;
 }
 

@@ -52,6 +52,7 @@ flowchart LR
 | Hosting | **Cloud Run** (asia-south1), min 1 instance, CPU always allocated for background analysis |
 | Storage | **Cloud Storage** (uploaded documents), **Firestore** (run results) |
 | Build | Cloud Build from source (`gcloud run deploy --source .`) |
+| Frontend | Vanilla JS, no build step. The landing page is a scroll-driven WebGL story (Three.js r169, vendored under `app/static/vendor`, MIT) with reduced-motion and no-WebGL fallbacks |
 
 ### Why the numbers can be trusted
 - The engine (`app/cbam/engine.py`) implements `Em = AD × NCV × EF × OxF`, attribution to the production process, `EE = M × SEE_precursor` and `SEE = (AttrEm + EE_InpMat) / AL`.

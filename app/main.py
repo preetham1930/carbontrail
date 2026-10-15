@@ -11,6 +11,7 @@ from pathlib import Path
 from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, JSONResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.gzip import GZipMiddleware
 from pydantic import BaseModel
 
 from . import config, exports, pipeline
@@ -21,6 +22,8 @@ ROOT = Path(__file__).resolve().parent
 SAMPLES = ROOT.parent / "samples"
 
 app = FastAPI(title="CarbonTrail", version="1.0")
+# Compress the page, scripts and the vendored 3D library (SSE streams are excluded by Starlette).
+app.add_middleware(GZipMiddleware, minimum_size=1024)
 
 if os.getenv("CT_DEV_SCRIPTED") == "1":  # offline UI development only
     from .agents import factory as _factory
