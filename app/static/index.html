@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CarbonTrail</title>
+<meta name="description" content="CarbonTrail turns a manufacturer's bills, invoices and production registers into EU CBAM emissions data a verifier can check.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="bar">
+  <a class="brand" href="/" aria-label="CarbonTrail home">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3c7 5 10 10 10 15a10 10 0 0 1-20 0C6 13 9 8 16 3Z" fill="var(--verdant)"/><path d="M16 29V10M16 17l5-4M16 22l-5-4" stroke="#E9C46A" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    <span>CarbonTrail</span>
+  </a>
+  <nav class="bar-nav">
+    <button class="link" data-open="ask">Ask about CBAM</button>
+    <a class="link" href="https://github.com/" id="repo-link" target="_blank" rel="noopener">Source code</a>
+  </nav>
+</header>
+
+<main id="app">
+  <!-- Landing -->
+  <section id="landing" class="landing">
+    <div class="landing-copy">
+      <h1>Paper in. Proof out.</h1>
+      <p class="lede">CarbonTrail reads a steel manufacturer's bills, invoices and handwritten registers, applies the EU's CBAM method, and hands back emissions data that an accredited verifier can trace to the source page.</p>
+      <div class="cta-row">
+        <button class="btn primary" id="run-demo">Run the demo factory</button>
+        <label class="btn ghost" for="file-input">Upload your documents</label>
+        <input type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.webp" hidden>
+      </div>
+      <p class="fine">The demo factory is a fictional fastener exporter in Ludhiana with ten real-looking documents for April to June 2026: photos, PDFs and a register written in Hindi and English.</p>
+      <dl class="facts">
+        <div><dt>Since 1 January 2026</dt><dd>EU importers pay for the carbon in steel, aluminium, cement and fertiliser.</dd></div>
+        <div><dt>No data, higher bill</dt><dd>Without the exporter's own figures, buyers must use EU default values plus a 10% mark-up, rising to 30% in 2028.</dd></div>
+        <div><dt>Built on Google Cloud</dt><dd>Gemini reads the documents, Google ADK agents check and explain, and every number comes from exact code.</dd></div>
+      </dl>
+    </div>
+    <div class="landing-art" aria-hidden="true">
+      <img src="/samples/07_production_register_q1.jpg" alt="" class="paper p1">
+      <img src="/samples/02_lpg_invoice_apr.jpg" alt="" class="paper p2">
+      <div class="proof">
+        <span class="proof-k">Specific embedded emissions</span>
+        <span class="proof-v">3.25</span>
+        <span class="proof-u">tCO2e per tonne of bolts</span>
+        <span class="proof-s">Every figure linked to its source</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Workspace -->
+  <section id="workspace" class="workspace" hidden>
+    <aside class="docs-panel" aria-label="Documents">
+      <div class="panel-head">
+        <h2>Documents</h2>
+        <span id="company" class="muted"></span>
+      </div>
+      <ul id="doc-list" class="doc-list"></ul>
+      <label class="btn small ghost add-doc" for="add-input">Add documents</label>
+      <input type="file" id="add-input" multiple accept=".pdf,.jpg,.jpeg,.png,.webp" hidden>
+    </aside>
+
+    <div class="main-col">
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+
+      <section id="result" class="result" hidden>
+        <div class="gauge-card">
+          <div class="gauge-head">
+            <div>
+              <h2 class="see-label">Specific embedded emissions</h2>
+              <p class="see-num"><span id="see-value">–</span><small>tCO2e per tonne</small></p>
+              <p id="see-basis" class="muted"></p>
+            </div>
+            <div class="money">
+              <p class="money-k" id="money-k">Gross certificate exposure on EU shipments this period</p>
+              <div class="money-row">
+                <div><span class="m-label">With your data</span><span class="m-val verdant" id="cost-actual">–</span></div>
+                <div><span class="m-label">On EU default values</span><span class="m-val gold" id="cost-default">–</span></div>
+              </div>
+              <p class="saving" id="saving"></p>
+            </div>
+          </div>
+          <div class="ruler" id="ruler" aria-label="SEE compared with EU default values"></div>
+          <div class="split" id="split"></div>
+        </div>
+
+        <nav class="tabs" role="tablist">
+          <button role="tab" class="tab" data-tab="summary" aria-selected="true">Summary</button>
+          <button role="tab" class="tab" data-tab="calc">Calculation</button>
+          <button role="tab" class="tab" data-tab="findings">Findings <span id="find-count" class="pill"></span></button>
+          <button role="tab" class="tab" data-tab="whatif">What if</button>
+          <button role="tab" class="tab" data-tab="supplier">Supplier data</button>
+          <button role="tab" class="tab" data-tab="trace">Agent activity</button>
+        </nav>
+
+        <div class="tabpanel" data-panel="summary">
+          <div class="two">
+            <article class="brief" id="brief-advice"></article>
+            <div class="side-stack">
+              <article class="card">
+                <h3>Goods</h3>
+                <table class="tbl" id="goods-table"></table>
+              </article>
+              <article class="card">
+                <h3>Same bolts, other origins</h3>
+                <p class="muted small">EU default for threaded bolts (CN 7318 15) in 2026, including the 10% mark-up, tCO2e per tonne. Your figure is drawn in green.</p>
+                <div id="origins" class="origins"></div>
+              </article>
+              <article class="card exports">
+                <h3>Hand it to your buyer and verifier</h3>
+                <a class="btn small" id="dl-xlsx" href="#">Download data pack (.xlsx)</a>
+                <a class="btn small ghost" id="dl-pdf" href="#">Download evidence pack (.pdf)</a>
+              </article>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabpanel" data-panel="calc" hidden>
+          <article class="brief" id="brief-calc"></article>
+          <ol class="steps" id="steps"></ol>
+          <p class="muted small" id="fa-note"></p>
+        </div>
+
+        <div class="tabpanel" data-panel="findings" hidden>
+          <article class="brief" id="brief-quality"></article>
+          <ul class="findings" id="findings"></ul>
+        </div>
+
+        <div class="tabpanel" data-panel="whatif" hidden>
+          <div class="whatif">
+            <form id="whatif-form" class="whatif-form">
+              <label>Wire rod supplier emissions <output id="o-see"></output>
+                <input type="range" id="w-see" min="0.4" max="4.6" step="0.02">
+                <span class="hint">Scrap-based EAF mills are near 0.5–1; coal-based BF-BOF mills 2–3.</span>
+              </label>
+              <label>Heat-treatment furnace fuel
+                <select id="w-fuel"><option value="">Keep current fuel</option><option value="natural_gas">Natural gas (PNG)</option><option value="lpg">LPG</option><option value="furnace_oil">Furnace oil</option></select>
+              </label>
+              <label>Less wire rod per tonne of fasteners <output id="o-yield"></output>
+                <input type="range" id="w-yield" min="0" max="6" step="0.5" value="0">
+              </label>
+              <label>Reporting year (default mark-up)
+                <select id="w-year"><option>2026</option><option>2027</option><option>2028</option></select>
+              </label>
+              <label class="check"><input type="checkbox" id="w-solar"> Switch the plant to 100% solar power</label>
+            </form>
+            <div class="whatif-out" id="whatif-out" aria-live="polite"></div>
+          </div>
+          <div id="agent-scenarios"></div>
+        </div>
+
+        <div class="tabpanel" data-panel="supplier" hidden>
+          <div class="supplier" id="supplier"></div>
+        </div>
+
+        <div class="tabpanel" data-panel="trace" hidden>
+          <ol class="trace" id="trace-done"></ol>
+        </div>
+      </section>
+
+      <section id="live" class="live">
+        <h2 class="live-h">Agents at work</h2>
+        <ol class="trace" id="trace"></ol>
+      </section>
+    </div>
+  </section>
+</main>
+
+<!-- Evidence drawer -->
+<aside id="drawer" class="drawer" aria-hidden="true" aria-label="Source document">
+  <div class="drawer-head">
+    <div><h2 id="drawer-title">Source</h2><p id="drawer-sub" class="muted small"></p></div>
+    <button class="icon-btn" id="drawer-close" aria-label="Close">×</button>
+  </div>
+  <div id="drawer-quotes" class="quotes"></div>
+  <div id="drawer-doc" class="drawer-doc"></div>
+</aside>
+
+<!-- Ask dialog -->
+<dialog id="ask" class="ask">
+  <form method="dialog" class="ask-head"><h2>Ask about CBAM</h2><button class="icon-btn" aria-label="Close">×</button></form>
+  <p class="muted small">Answers come from curated, cited regulation notes and, if you ran an analysis, your factory's figures.</p>
+  <div class="ask-log" id="ask-log"></div>
+  <div class="ask-suggest" id="ask-suggest">
+    <button class="chip">Why doesn't my solar plant reduce the CBAM figure?</button>
+    <button class="chip">When does my buyer actually pay?</button>
+    <button class="chip">Does the UK shipment need CBAM data?</button>
+  </div>
+  <form id="ask-form" class="ask-form"><input id="ask-input" placeholder="Type a question" autocomplete="off" aria-label="Question"><button class="btn small primary">Ask</button></form>
+</dialog>
+
+<script src="/app.js" defer></script>
+</body>
+</html>

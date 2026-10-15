@@ -1,0 +1,41 @@
+{
+ "doc_type": "export_invoice",
+ "issuer": "Verkam Fasteners Pvt. Ltd.",
+ "recipient": "Kessler Befestigungstechnik GmbH (fictional)",
+ "document_number": "VF/EXP/26-27/019",
+ "document_date": "2026-05-18",
+ "languages": [
+  "English"
+ ],
+ "line_items": [
+  {
+   "kind": "export",
+   "description": "Hex bolts M8-M16, 8.8, zinc plated",
+   "quantity": 80.0,
+   "unit": "MT",
+   "source_quote": "Hex bolts M8-M16, 8.8, zinc plated 7318 15 80.000",
+   "page": 1,
+   "confidence": 0.95,
+   "cn_code": "7318 15",
+   "destination_country": "Germany",
+   "party": "Kessler Befestigungstechnik GmbH (fictional)",
+   "period_start": "2026-05-18",
+   "period_end": "2026-05-18"
+  },
+  {
+   "kind": "export",
+   "description": "Hex nuts M8-M16, class 8",
+   "quantity": 25.0,
+   "unit": "MT",
+   "source_quote": "Hex nuts M8-M16, class 8 7318 16 25.000",
+   "page": 1,
+   "confidence": 0.95,
+   "cn_code": "7318 16",
+   "destination_country": "Germany",
+   "party": "Kessler Befestigungstechnik GmbH (fictional)",
+   "period_start": "2026-05-18",
+   "period_end": "2026-05-18"
+  }
+ ],
+ "reading_notes": []
+}

@@ -1,0 +1,55 @@
+{
+  "_about": "Reference values used by the CarbonTrail calculation engine. Every value carries its source. Values marked verify=true must be checked against the Official Journal text before a real filing.",
+  "regulations": {
+    "cbam_regulation": "Regulation (EU) 2023/956, as amended by Regulation (EU) 2025/2083 (Omnibus simplification, in force 20 Oct 2025)",
+    "methodology": "Commission Implementing Regulation (EU) 2025/2547 (calculation of embedded emissions, definitive period)",
+    "default_values": "Commission Implementing Regulation (EU) 2025/2621, as corrected by Implementing Regulation (EU) 2026/1740 (applies retroactively from 1 Jan 2026)",
+    "benchmarks": "Commission Implementing Regulation (EU) 2025/2620 (free-allocation adjustment benchmarks)"
+  },
+  "default_markup": {
+    "_source": "IR (EU) 2025/2621 mark-up schedule for iron & steel, aluminium, cement, hydrogen (fertilisers: 1%)",
+    "2026": 0.10,
+    "2027": 0.20,
+    "2028": 0.30
+  },
+  "certificate_price_eur": {
+    "_source": "European Commission quarterly CBAM certificate price for 2026 imports (Art. 21(1a)): average of EU ETS auction clearing prices",
+    "2026-Q1": 75.36,
+    "2026-Q2": 75.28,
+    "2026-Q3": 82.32,
+    "latest": "2026-Q3"
+  },
+  "cbam_factor": {
+    "_source": "Free-allocation share retained under Art. 10a(1a) Directive 2003/87/EC, used in the free-allocation adjustment",
+    "2026": 0.975
+  },
+  "product_defaults": {
+    "_source": "IR (EU) 2025/2621 Annex I as corrected by IR (EU) 2026/1740; direct emissions only for iron & steel; values in tCO2e per tonne of good, before mark-up. Retrieved via cbamdefaults.com product pages.",
+    "731815": {
+      "description": "Threaded screws and bolts, of iron or steel",
+      "values": {"India": 5.72, "China": 6.38, "Viet Nam": 2.75, "Indonesia": 8.23, "Thailand": 2.41, "Korea": 3.47, "Taiwan": 2.71, "Japan": 2.80}
+    },
+    "731816": {
+      "description": "Nuts of iron or steel",
+      "values": {"India": 5.14, "China": 5.04, "Viet Nam": 2.96, "Indonesia": 8.54, "Thailand": 4.45, "Korea": 4.10, "Taiwan": 2.71, "Japan": 3.06}
+    }
+  },
+  "precursor_defaults": {
+    "_source": "IR (EU) 2025/2621 Annex I, India, bars and rods (CN 7213/7214): published range 4.27-4.32 tCO2e/t direct (GreenSutra summary). Upper value used as a conservative placeholder. VERIFY against Annex IV (precursor defaults for operators) before a real filing.",
+    "verify": true,
+    "7213": {"description": "Bars and rods, hot-rolled, in irregularly wound coils (wire rod)", "values": {"India": 4.32}}
+  },
+  "benchmarks_info": {
+    "_source": "IR (EU) 2025/2620, CN 7213/7214 20 00 row, tCO2e/t (shown for context only)",
+    "7213": {"BF-BOF": 1.364, "DRI-EAF": 0.475, "Scrap-EAF": 0.066}
+  },
+  "fuels": {
+    "_source": "IPCC 2006 Guidelines Vol. 2 Ch. 1, Tables 1.2 and 1.4 (default NCV and CO2 emission factors), the fuel defaults referenced by the CBAM methodology. Oxidation factor 1.0 (default). Densities are stated assumptions used only when the invoice is in litres or SCM.",
+    "lpg":          {"label": "Liquefied petroleum gas (LPG)", "ncv_gj_per_t": 47.3, "ef_t_per_tj": 63.1, "density_t_per_kl": 0.54},
+    "natural_gas":  {"label": "Natural gas (PNG)",            "ncv_gj_per_t": 48.0, "ef_t_per_tj": 56.1, "density_t_per_kscm": 0.75},
+    "diesel":       {"label": "Gas/diesel oil (HSD)",         "ncv_gj_per_t": 43.0, "ef_t_per_tj": 74.1, "density_t_per_kl": 0.835},
+    "furnace_oil":  {"label": "Residual fuel oil (furnace oil)", "ncv_gj_per_t": 40.4, "ef_t_per_tj": 77.4, "density_t_per_kl": 0.95},
+    "petrol":       {"label": "Motor gasoline",               "ncv_gj_per_t": 44.3, "ef_t_per_tj": 69.3, "density_t_per_kl": 0.745},
+    "coal":         {"label": "Other bituminous coal",        "ncv_gj_per_t": 25.8, "ef_t_per_tj": 94.6}
+  }
+}

@@ -1,0 +1,90 @@
+[
+ {
+  "file": "01_wire_rod_supplies_q1.pdf",
+  "mime": "application/pdf",
+  "title": "Wire rod statement of supplies, Apr-Jun (PDF)",
+  "stage": "initial",
+  "kind": "precursor",
+  "sha256": "f27cf9c5c111f9a368521466dca585743615e7dafd2ad355c3dde424164a263e"
+ },
+ {
+  "file": "02_lpg_invoice_apr.jpg",
+  "mime": "image/jpeg",
+  "title": "LPG invoice SGS/26-27/0107 (photo)",
+  "stage": "initial",
+  "kind": "fuel",
+  "sha256": "fb073c0296f3d3214dad59f6eff4aba5dec0536338e078e57932954589d8cf64"
+ },
+ {
+  "file": "03_lpg_invoice_may.jpg",
+  "mime": "image/jpeg",
+  "title": "LPG invoice SGS/26-27/0349 (photo)",
+  "stage": "initial",
+  "kind": "fuel",
+  "sha256": "15db96da7a5048d2a382285e07c50569ac43ca256b1ac8b6bae30c555f86026d"
+ },
+ {
+  "file": "04_lpg_invoice_jun.pdf",
+  "mime": "application/pdf",
+  "title": "LPG e-invoice June (PDF)",
+  "stage": "initial",
+  "kind": "fuel",
+  "sha256": "6ff55f55463ef766fedf07dd65678d12bfb6ee57577961260ebaa37600e0f2a6"
+ },
+ {
+  "file": "05_diesel_dg_statement.jpg",
+  "mime": "image/jpeg",
+  "title": "Diesel statement for DG set (photo)",
+  "stage": "initial",
+  "kind": "fuel",
+  "sha256": "4fba1aafa32af04ebda4ace18c848cfdac09fa8d875222da561ae8c05670278b"
+ },
+ {
+  "file": "06_electricity_bill_jun.pdf",
+  "mime": "application/pdf",
+  "title": "Electricity bill June (PDF)",
+  "stage": "initial",
+  "kind": "electricity",
+  "sha256": "71f8ef69ea67d1b2e8e258463d5ca7c8aad888270c3471a2ba2b2a8a4f09e75c"
+ },
+ {
+  "file": "07_production_register_q1.jpg",
+  "mime": "image/jpeg",
+  "title": "Handwritten production register, Hindi/English (photo)",
+  "stage": "initial",
+  "kind": "production",
+  "sha256": "d26fcfd97df2f0844d666569f67e283c7a01a8966e42b1f73c7d839123e6a358"
+ },
+ {
+  "file": "08_export_invoice_de.pdf",
+  "mime": "application/pdf",
+  "title": "Export invoice to Germany (PDF)",
+  "stage": "initial",
+  "kind": "export",
+  "sha256": "9224bab277139d03c906b2881e93e4f7845148d4372f15a7508c1a12aecedff5"
+ },
+ {
+  "file": "09_export_invoice_pl.jpg",
+  "mime": "image/jpeg",
+  "title": "Export invoice to Poland (photo)",
+  "stage": "initial",
+  "kind": "export",
+  "sha256": "8de2f18fa4c9c2fcab44fb98040a89d26809e6bedc1335982d2816656b0ea703"
+ },
+ {
+  "file": "10_export_invoice_uk.pdf",
+  "mime": "application/pdf",
+  "title": "Export invoice to United Kingdom (PDF)",
+  "stage": "initial",
+  "kind": "export",
+  "sha256": "b092e7ff4ec548338d8ee440a379cc8a8a5bdbe6f543c076563da0c90ee333f5"
+ },
+ {
+  "file": "11_supplier_emissions_declaration.pdf",
+  "mime": "application/pdf",
+  "title": "Supplier reply: verified wire rod emissions (PDF)",
+  "stage": "supplier_reply",
+  "kind": "supplier",
+  "sha256": "80bc413fc7c49e98e54fd6d1b6f071b9acc646600de77f7431b62467510f2dfe"
+ }
+]

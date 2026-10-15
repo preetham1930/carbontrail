@@ -1,0 +1,28 @@
+{
+ "doc_type": "electricity_bill",
+ "issuer": "Punjab Power Distribution Co. (sample)",
+ "recipient": "Verkam Fasteners Pvt. Ltd.",
+ "document_number": "LS-3302-41178",
+ "document_date": "2026-07-05",
+ "period_start": "2026-06-01",
+ "period_end": "2026-06-30",
+ "languages": [
+  "English"
+ ],
+ "line_items": [
+  {
+   "kind": "electricity",
+   "description": "Grid electricity, kWh main meter",
+   "quantity": 135900,
+   "unit": "kWh",
+   "source_quote": "Total consumption: 135,900 kWh",
+   "page": 1,
+   "confidence": 0.95,
+   "period_start": "2026-06-01",
+   "period_end": "2026-06-30"
+  }
+ ],
+ "reading_notes": [
+  "Only the June bill was provided."
+ ]
+}

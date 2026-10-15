@@ -1,0 +1,35 @@
+# CarbonTrail regulation notes (curated, with sources)
+
+Each note has an ID in square brackets. Cite IDs when answering.
+
+[K1] CBAM's definitive period began on 1 January 2026. EU importers (authorised CBAM declarants) must buy and surrender CBAM certificates covering the embedded emissions of covered goods. The transitional, reporting-only period ran from 1 October 2023 to 31 December 2025. Source: Regulation (EU) 2023/956; https://taxation-customs.ec.europa.eu/carbon-border-adjustment-mechanism_en
+
+[K2] Covered sectors: cement, iron and steel, aluminium, fertilisers, electricity and hydrogen, including some precursors. Screws, bolts and nuts of iron or steel (CN 7318) are covered. Ferrous scrap (7204) is not. Source: Annex I of Regulation (EU) 2023/956.
+
+[K3] For iron and steel, aluminium and hydrogen goods only direct emissions count. For cement and fertilisers both direct and indirect (electricity) emissions count. Source: Annex II of Regulation (EU) 2023/956; https://cbamguide.com/compliance/embedded-emissions/
+
+[K4] Embedded emissions are calculated with Commission Implementing Regulation (EU) 2025/2547. Specific embedded emissions (SEE) = (attributed direct emissions of the production process + embedded emissions of relevant precursors consumed) / activity level (tonnes produced). Combustion emissions use activity data x net calorific value x emission factor x oxidation factor. Source: IR (EU) 2025/2547; Commission Guidance No. 3 (14 August 2026).
+
+[K5] Legally the obligation sits with the EU importer, but non-EU producers must calculate installation-level embedded emissions with the EU method and give accurate, verifiable data to their EU buyers. Operators share data with the Commission's Communication Template (an Excel workbook) or via the CBAM Registry operators portal. Source: Commission Guidance No. 2, quick guide for non-EU operators (14 August 2026); https://taxation-customs.ec.europa.eu/system/files/2026-08/Guidance%20No.%202%20-%20Quick%20guide%20for%20non-EU%20operators%20on%20CBAM%20implementation.pdf
+
+[K6] From 2026, actual embedded emissions used in a declaration must be verified by an accredited verifier. Default values do not need verification. The Commission published guidance on verification and accreditation on 24 August 2026. Source: https://taxation-customs.ec.europa.eu/carbon-border-adjustment-mechanism/cbam-communication-and-news_en; https://www.cassidylevy.com/news/key-omnibus-simplifications-to-cbam-now-final/
+
+[K7] Default values are set per country and product in Implementing Regulation (EU) 2025/2621, corrected by IR (EU) 2026/1740 (published 31 July 2026, applying from 1 January 2026). For iron and steel, a mark-up is added: 10% in 2026, 20% in 2027, 30% from 2028 (fertilisers: 1%). Source: https://cbamguide.com/compliance/default-values/
+
+[K8] Example defaults before mark-up (tCO2e per tonne, direct): threaded screws and bolts CN 7318 15 from India 5.72, China 6.38, Viet Nam 2.75, Indonesia 8.23, Thailand 2.41, South Korea 3.47, Taiwan 2.71, Japan 2.80. Nuts CN 7318 16 from India 5.14. Source: IR (EU) 2025/2621 as corrected, via https://cbamdefaults.com/cbam/product/731815 and /731816
+
+[K9] Certificate price for 2026 imports is set quarterly as the average of EU ETS auction clearing prices: Q1 2026 EUR 75.36, Q2 2026 EUR 75.28, Q3 2026 EUR 82.32 per tCO2e (Q3 published 5 October 2026). From 2027 a weekly price applies. Certificate sales open 1 February 2027; the first annual declaration for 2026 imports is due 30 September 2027. Source: https://cbamguide.com/news/2026-08-05-q3-cbam-certificate-price-tracking-above-q2/; https://carbonmarketnetwork.com/blog/cbam-steel-industry/
+
+[K10] Certificates surrendered are reduced by a free-allocation adjustment based on product benchmarks (IR (EU) 2025/2620). In 2026 the CBAM factor is 97.5%, so the adjustment per tonne is 0.975 x benchmark. Example benchmark, bars and rods CN 7213 BF-BOF route: 1.364 tCO2e/t. Source: https://cbamguide.com/sectors/steel/
+
+[K11] De minimis: importers bringing in 50 tonnes or less of CBAM goods per year (iron & steel, aluminium, cement, fertilisers combined) are exempt. The threshold removes about 90% of importers but keeps over 99% of embedded emissions in scope, so large EU buyers still need data. Source: Regulation (EU) 2025/2083; https://www.cassidylevy.com/news/key-omnibus-simplifications-to-cbam-now-final/
+
+[K12] Article 9 allows a deduction for a carbon price effectively paid in the country of origin. Whether India's Carbon Credit Trading Scheme (credits, not an explicit carbon price) qualifies is debated. First CCTS compliance trades were expected around October 2026. Source: https://www.livelaw.in/amp/articles/carbon-credits-carbon-prices-ccts-cbam-article9-bar-543236; https://icapcarbonaction.com/en/ets/indian-carbon-credit-trading-scheme
+
+[K13] The UK runs a separate CBAM from 1 January 2027 covering aluminium, cement, fertiliser, hydrogen, and iron and steel. The charge falls on UK importers above a GBP 50,000 threshold; indirect emissions are not expected before 2029. Source: https://gerlach-customs.com/news/knowledge-base/uk-cbam-2027-eu-exporters/; https://www.seedling.earth/post/the-uk-cbam-a-guide-for-businesses-ahead-of-2027
+
+[K14] An EU proposal would extend CBAM to about 180 steel- and aluminium-intensive downstream products (for example machinery, automotive parts, fabricated metal goods) from 2028. It still has to pass the legislative process. Source: https://www.savictech.com/insights/eu-cbam-india-exporters-sap-sustainability-2026/
+
+[K15] Trade impact: Fastmarkets estimates India will bear about 18% of CBAM costs, nearly double its share of EU import value. Producers with actual emissions data are gaining share as trade restructures around CBAM costs. Source: https://www.fastmarkets.com/insights/cbam-regulation-report-navigating-the-eus-new-carbon-border-rules-for-metals/; https://www.fastmarkets.com/insights/cbam-front-loading-how-aluminium-and-hrc-trade-flows-turned-in-late-2025/
+
+[K16] Emissions from fuel burned to generate electricity on site (for example a diesel generator) are electricity emissions. For iron and steel goods they do not count, because only direct emissions of the production process are counted. Renewable electricity therefore does not lower the EU CBAM figure for steel fasteners, although it matters for other schemes and for customers' Scope 2 reporting. Source: IR (EU) 2025/2547 attribution rules; Annex II of Regulation (EU) 2023/956.

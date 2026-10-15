@@ -1,0 +1,31 @@
+{
+ "doc_type": "supplier_emissions_declaration",
+ "issuer": "Shivalik Wire & Steel Ltd.",
+ "recipient": "Verkam Fasteners Pvt. Ltd.",
+ "document_number": null,
+ "document_date": "2026-08-28",
+ "period_start": "2026-01-01",
+ "period_end": "2026-06-30",
+ "languages": [
+  "English"
+ ],
+ "line_items": [
+  {
+   "kind": "supplier_see",
+   "description": "Wire rod specific embedded emissions (direct), BF-BOF",
+   "quantity": 2.36,
+   "unit": "tCO2e per tonne",
+   "source_quote": "Specific embedded emissions (direct) 2.36 tCO2e per tonne",
+   "page": 1,
+   "confidence": 0.95,
+   "cn_code": "7213 91 90",
+   "party": "Shivalik Wire & Steel Ltd.",
+   "verified": true,
+   "period_start": "2026-01-01",
+   "period_end": "2026-06-30"
+  }
+ ],
+ "reading_notes": [
+  "Indirect value 0.31 tCO2e/t given for information only."
+ ]
+}

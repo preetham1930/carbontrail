@@ -1,0 +1,39 @@
+{
+ "doc_type": "export_invoice",
+ "issuer": "Verkam Fasteners Pvt. Ltd.",
+ "recipient": "Zaklady Laczne Wisla Sp. z o.o.",
+ "document_number": "VF/EXP/26-27/031",
+ "document_date": "2026-06-02",
+ "languages": [
+  "English"
+ ],
+ "line_items": [
+  {
+   "kind": "export",
+   "description": "Hex bolts M10-M16, 8.8, zinc plated",
+   "quantity": 40.0,
+   "unit": "MT",
+   "source_quote": "Hex bolts M10-M16, 8.8, zinc plated 7318 15 40.000",
+   "page": 1,
+   "confidence": 0.95,
+   "cn_code": "7318 15",
+   "destination_country": "Poland",
+   "period_start": "2026-06-02",
+   "period_end": "2026-06-02"
+  },
+  {
+   "kind": "export",
+   "description": "Hex nuts M10-M16, class 8",
+   "quantity": 15.0,
+   "unit": "MT",
+   "source_quote": "Hex nuts M10-M16, class 8 7318 16 15.000",
+   "page": 1,
+   "confidence": 0.95,
+   "cn_code": "7318 16",
+   "destination_country": "Poland",
+   "period_start": "2026-06-02",
+   "period_end": "2026-06-02"
+  }
+ ],
+ "reading_notes": []
+}

@@ -1,0 +1,56 @@
+{
+ "doc_type": "fuel_invoice",
+ "issuer": "Guru Nanak Filling Station",
+ "recipient": "Verkam Fasteners Pvt. Ltd.",
+ "document_number": null,
+ "document_date": "2026-06-30",
+ "period_start": "2026-04-01",
+ "period_end": "2026-06-30",
+ "languages": [
+  "English"
+ ],
+ "line_items": [
+  {
+   "kind": "fuel",
+   "description": "HSD for DG set 500 kVA",
+   "quantity": 3200,
+   "unit": "Litres",
+   "source_quote": "08-04-2026 HSD 3,200 94.10",
+   "page": 1,
+   "confidence": 0.95,
+   "fuel_type": "diesel",
+   "fuel_use": "electricity_generation",
+   "period_start": "2026-04-08",
+   "period_end": "2026-04-08"
+  },
+  {
+   "kind": "fuel",
+   "description": "HSD for DG set 500 kVA",
+   "quantity": 3400,
+   "unit": "Litres",
+   "source_quote": "21-05-2026 HSD 3,400 94.35",
+   "page": 1,
+   "confidence": 0.95,
+   "fuel_type": "diesel",
+   "fuel_use": "electricity_generation",
+   "period_start": "2026-05-21",
+   "period_end": "2026-05-21"
+  },
+  {
+   "kind": "fuel",
+   "description": "HSD for DG set 500 kVA",
+   "quantity": 3000,
+   "unit": "Litres",
+   "source_quote": "17-06-2026 HSD 3,000 94.60",
+   "page": 1,
+   "confidence": 0.95,
+   "fuel_type": "diesel",
+   "fuel_use": "electricity_generation",
+   "period_start": "2026-06-17",
+   "period_end": "2026-06-17"
+  }
+ ],
+ "reading_notes": [
+  "Handwritten note confirms all deliveries were for the DG set."
+ ]
+}

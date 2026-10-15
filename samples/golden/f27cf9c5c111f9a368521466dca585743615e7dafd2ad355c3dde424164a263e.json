@@ -1,0 +1,56 @@
+{
+ "doc_type": "precursor_purchase_invoice",
+ "issuer": "Shivalik Wire & Steel Ltd.",
+ "recipient": "Verkam Fasteners Pvt. Ltd.",
+ "document_number": null,
+ "document_date": "2026-06-30",
+ "period_start": "2026-04-01",
+ "period_end": "2026-06-30",
+ "languages": [
+  "English"
+ ],
+ "line_items": [
+  {
+   "kind": "precursor_purchase",
+   "description": "Hot rolled steel wire rod SAE1018 8.0 mm",
+   "quantity": 90.0,
+   "unit": "MT",
+   "source_quote": "SWS/WR/1123 11-04-2026 SAE1018 / 8.0 mm 72139190 90.000",
+   "page": 1,
+   "confidence": 0.95,
+   "cn_code": "7213 91 90",
+   "party": "Shivalik Wire & Steel Ltd.",
+   "period_start": "2026-04-11",
+   "period_end": "2026-04-11"
+  },
+  {
+   "kind": "precursor_purchase",
+   "description": "Hot rolled steel wire rod 10B21 10.0 mm",
+   "quantity": 95.24,
+   "unit": "MT",
+   "source_quote": "SWS/WR/1311 16-05-2026 10B21 / 10.0 mm 72139190 95.240",
+   "page": 1,
+   "confidence": 0.95,
+   "cn_code": "7213 91 90",
+   "party": "Shivalik Wire & Steel Ltd.",
+   "period_start": "2026-05-16",
+   "period_end": "2026-05-16"
+  },
+  {
+   "kind": "precursor_purchase",
+   "description": "Hot rolled steel wire rod SAE1018 12.0 mm",
+   "quantity": 84.76,
+   "unit": "MT",
+   "source_quote": "SWS/WR/1502 12-06-2026 SAE1018 / 12.0 mm 72139190 84.760",
+   "page": 1,
+   "confidence": 0.95,
+   "cn_code": "7213 91 90",
+   "party": "Shivalik Wire & Steel Ltd.",
+   "period_start": "2026-06-12",
+   "period_end": "2026-06-12"
+  }
+ ],
+ "reading_notes": [
+  "Supplier states BF-BOF route; emissions data available on request."
+ ]
+}

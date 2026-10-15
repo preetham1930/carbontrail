@@ -1,0 +1,27 @@
+{
+ "doc_type": "export_invoice",
+ "issuer": "Verkam Fasteners Pvt. Ltd.",
+ "recipient": "Midlands Fixings Ltd (fictional)",
+ "document_number": "VF/EXP/26-27/027",
+ "document_date": "2026-06-24",
+ "languages": [
+  "English"
+ ],
+ "line_items": [
+  {
+   "kind": "export",
+   "description": "Hex bolts M12-M20, 10.9",
+   "quantity": 20.0,
+   "unit": "MT",
+   "source_quote": "Hex bolts M12-M20, 10.9 7318 15 20.000",
+   "page": 1,
+   "confidence": 0.95,
+   "cn_code": "7318 15",
+   "destination_country": "United Kingdom",
+   "party": "Midlands Fixings Ltd (fictional)",
+   "period_start": "2026-06-24",
+   "period_end": "2026-06-24"
+  }
+ ],
+ "reading_notes": []
+}

@@ -1,0 +1,30 @@
+{
+ "doc_type": "fuel_invoice",
+ "issuer": "Satluj Gas Services",
+ "recipient": "Verkam Fasteners Pvt. Ltd.",
+ "document_number": "SGS/26-27/0349",
+ "document_date": "2026-05-12",
+ "period_start": null,
+ "period_end": null,
+ "languages": [
+  "English"
+ ],
+ "line_items": [
+  {
+   "kind": "fuel",
+   "description": "LPG (bulk) for industrial use - hardening & tempering furnace",
+   "quantity": 20100,
+   "unit": "KG",
+   "source_quote": "LPG (bulk) for industrial use 27111900 20,100 KG",
+   "page": 1,
+   "confidence": 0.95,
+   "fuel_type": "lpg",
+   "fuel_use": "process_heat",
+   "period_start": "2026-05-12",
+   "period_end": "2026-05-12"
+  }
+ ],
+ "reading_notes": [
+  "Photo slightly skewed; all figures legible."
+ ]
+}

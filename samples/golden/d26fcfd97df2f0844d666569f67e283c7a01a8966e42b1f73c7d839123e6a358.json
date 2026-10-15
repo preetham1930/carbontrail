@@ -1,0 +1,160 @@
+{
+ "doc_type": "production_register",
+ "issuer": "Verkam Fasteners - Plant 1",
+ "recipient": null,
+ "document_number": null,
+ "document_date": "2026-06-30",
+ "period_start": "2026-04-01",
+ "period_end": "2026-06-30",
+ "languages": [
+  "Hindi",
+  "English"
+ ],
+ "line_items": [
+  {
+   "kind": "precursor_consumption",
+   "description": "Wire rod issued to production",
+   "quantity": 86.4,
+   "unit": "MT",
+   "source_quote": "Apr-26 86.4",
+   "page": 1,
+   "confidence": 0.95,
+   "cn_code": "7213",
+   "period_start": "2026-04-01",
+   "period_end": "2026-04-30"
+  },
+  {
+   "kind": "production",
+   "description": "Bolts (7318 15)",
+   "quantity": 60.1,
+   "unit": "MT",
+   "source_quote": "Apr-26 60.1",
+   "page": 1,
+   "confidence": 0.93,
+   "cn_code": "7318 15",
+   "period_start": "2026-04-01",
+   "period_end": "2026-04-30"
+  },
+  {
+   "kind": "production",
+   "description": "Nuts (7318 16)",
+   "quantity": 20.3,
+   "unit": "MT",
+   "source_quote": "Apr-26 20.3",
+   "page": 1,
+   "confidence": 0.95,
+   "cn_code": "7318 16",
+   "period_start": "2026-04-01",
+   "period_end": "2026-04-30"
+  },
+  {
+   "kind": "scrap",
+   "description": "Process scrap",
+   "quantity": 6.0,
+   "unit": "MT",
+   "source_quote": "Apr-26 6.0",
+   "page": 1,
+   "confidence": 0.95,
+   "period_start": "2026-04-01",
+   "period_end": "2026-04-30"
+  },
+  {
+   "kind": "precursor_consumption",
+   "description": "Wire rod issued to production",
+   "quantity": 89.9,
+   "unit": "MT",
+   "source_quote": "May-26 89.9",
+   "page": 1,
+   "confidence": 0.95,
+   "cn_code": "7213",
+   "period_start": "2026-05-01",
+   "period_end": "2026-05-31"
+  },
+  {
+   "kind": "production",
+   "description": "Bolts (7318 15)",
+   "quantity": 62.5,
+   "unit": "MT",
+   "source_quote": "May-26 62.5",
+   "page": 1,
+   "confidence": 0.72,
+   "cn_code": "7318 15",
+   "period_start": "2026-05-01",
+   "period_end": "2026-05-31"
+  },
+  {
+   "kind": "production",
+   "description": "Nuts (7318 16)",
+   "quantity": 21.0,
+   "unit": "MT",
+   "source_quote": "May-26 21.0",
+   "page": 1,
+   "confidence": 0.95,
+   "cn_code": "7318 16",
+   "period_start": "2026-05-01",
+   "period_end": "2026-05-31"
+  },
+  {
+   "kind": "scrap",
+   "description": "Process scrap",
+   "quantity": 6.4,
+   "unit": "MT",
+   "source_quote": "May-26 6.4",
+   "page": 1,
+   "confidence": 0.95,
+   "period_start": "2026-05-01",
+   "period_end": "2026-05-31"
+  },
+  {
+   "kind": "precursor_consumption",
+   "description": "Wire rod issued to production",
+   "quantity": 86.0,
+   "unit": "MT",
+   "source_quote": "Jun-26 86.0",
+   "page": 1,
+   "confidence": 0.95,
+   "cn_code": "7213",
+   "period_start": "2026-06-01",
+   "period_end": "2026-06-30"
+  },
+  {
+   "kind": "production",
+   "description": "Bolts (7318 15)",
+   "quantity": 59.8,
+   "unit": "MT",
+   "source_quote": "Jun-26 59.8",
+   "page": 1,
+   "confidence": 0.93,
+   "cn_code": "7318 15",
+   "period_start": "2026-06-01",
+   "period_end": "2026-06-30"
+  },
+  {
+   "kind": "production",
+   "description": "Nuts (7318 16)",
+   "quantity": 20.3,
+   "unit": "MT",
+   "source_quote": "Jun-26 20.3",
+   "page": 1,
+   "confidence": 0.95,
+   "cn_code": "7318 16",
+   "period_start": "2026-06-01",
+   "period_end": "2026-06-30"
+  },
+  {
+   "kind": "scrap",
+   "description": "Process scrap",
+   "quantity": 5.9,
+   "unit": "MT",
+   "source_quote": "Jun-26 5.9",
+   "page": 1,
+   "confidence": 0.95,
+   "period_start": "2026-06-01",
+   "period_end": "2026-06-30"
+  }
+ ],
+ "reading_notes": [
+  "May bolts value overwritten: 61.5 crossed out and corrected to 62.5 in red ink.",
+  "Total row present (262.3 / 182.4 / 61.6 / 18.3) and not extracted separately."
+ ]
+}
