@@ -44,7 +44,7 @@
 
 * { box-sizing: border-box; }
 html, body { margin: 0; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: clip; }
 body {
   background: var(--paper);
   color: var(--ink);

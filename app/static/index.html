@@ -23,6 +23,7 @@
     <span>CarbonTrail</span>
   </a>
   <nav class="bar-nav" aria-label="Main">
+    <a class="nav-l only-landing" href="#journey">The journey</a>
     <a class="nav-l only-landing" href="#explode">How it works</a>
     <a class="nav-l only-landing" href="#paper">Documents</a>
     <a class="nav-l only-landing" href="#agents">Agents</a>
@@ -50,6 +51,28 @@
           <input type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.webp" hidden>
         </div>
         <p class="hero-note">Powered by Gemini 3.8 Flash and Google ADK on Cloud Run.</p>
+      </section>
+
+      <section class="journey" id="journey" aria-label="The journey of one container of bolts to Europe">
+        <div class="journey-pin">
+          <canvas id="journey-canvas" aria-hidden="true"></canvas>
+          <div class="j-labels" id="j-labels" aria-hidden="true">
+            <span class="j-tag" data-anchor="factory">Verkam Fasteners · Ludhiana</span>
+            <span class="j-tag carbon" data-anchor="container"><b>5.36</b> tCO2e per tonne, inside</span>
+            <span class="j-tag" data-anchor="sea">To Europe</span>
+            <span class="j-bill" data-anchor="gate"><small>EU border · CBAM</small><b id="j-bill-eur">€80,772</b><em id="j-bill-note">EU default + 10% mark-up</em></span>
+            <span class="j-tag" data-anchor="warehouse">Buyer · Germany</span>
+          </div>
+          <div class="j-copy" id="j-copy">
+            <article class="j-step" data-step="0"><p class="j-k">01 · The factory</p><h2>Made in Ludhiana.</h2><p>Every tonne of bolts leaves the factory carrying the carbon it took to make it.</p></article>
+            <article class="j-step" data-step="1"><p class="j-k">02 · The paperwork</p><h2>The proof is on paper.</h2><p>Fuel invoices, the steel mill’s statement, a handwritten register. The only record of that carbon.</p></article>
+            <article class="j-step" data-step="2"><p class="j-k">03 · The crossing</p><h2>Then, the long way to Europe.</h2><p>The carbon crosses the sea with the goods. Since 2026, Europe counts it.</p></article>
+            <article class="j-step" data-step="3"><p class="j-k">04 · The EU border</p><h2>Here, carbon has a price.</h2><p>Without verified data, the buyer pays on the EU default plus a mark-up: <b class="amber">€80,772</b> this quarter.</p></article>
+            <article class="j-step" data-step="4"><p class="j-k">05 · With CarbonTrail</p><h2>The proof travels with it.</h2><p>Verified figures, every one traced to its page. The same shipments: <b class="green">€42,824</b>.</p></article>
+            <article class="j-step" data-step="5"><p class="j-k">06 · Delivered</p><h2>Delivered. <span class="green">€37,948</span> saved.</h2><p>One quarter, one fastener exporter. Now take CarbonTrail apart.</p></article>
+          </div>
+          <ol class="j-progress" id="j-progress" aria-hidden="true"><li>Factory</li><li>Paperwork</li><li>Sea</li><li>EU border</li><li>Verified</li><li>Delivered</li></ol>
+        </div>
       </section>
 
       <section class="explode" id="explode" aria-label="How CarbonTrail works, part by part">
@@ -192,7 +215,7 @@
             <li>Sources: Regulation (EU) 2023/956; Implementing Regulations (EU) 2025/2547 and 2025/2621; quarterly CBAM certificate prices; IPCC 2006 Guidelines. CarbonTrail prepares verification-ready data; it does not replace the accredited verifier or the EU declarant.</li>
           </ol>
           <div class="foot-cols">
-            <div><p>Product</p><a href="#explode">How it works</a><a href="#paper">Documents</a><button type="button" class="foot-btn" data-run-demo>Run the demo</button></div>
+            <div><p>Product</p><a href="#journey">The journey</a><a href="#explode">How it works</a><a href="#paper">Documents</a><button type="button" class="foot-btn" data-run-demo>Run the demo</button></div>
             <div><p>Technology</p><a href="#agents">Agents</a><a href="#stack">Google Cloud</a><a href="https://github.com/preetham1930/carbontrail" target="_blank" rel="noopener">Source code</a></div>
             <div><p>Team Verdant</p><span>Preetham Kukkadapu</span><span>Harshitha Neelam</span><span>Google Cloud AI Builder Cup 2026</span></div>
           </div>
@@ -351,5 +374,6 @@
 
 <script src="/app.js" defer></script>
 <script type="module" src="/landing.js"></script>
+<script type="module" src="/journey.js"></script>
 </body>
 </html>

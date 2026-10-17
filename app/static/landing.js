@@ -11,23 +11,27 @@ const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const smooth = (a, b, v) => { const t = clamp((v - a) / (b - a)); return t * t * (3 - 2 * t); };
 const mix = (a, b, t) => a + (b - a) * t;
 
-const stage = $("#stage"), hero = $("#hero"), explode = $("#explode");
+const stage = $("#stage"), hero = $("#hero"), explode = $("#explode"), journeyEl = $("#journey");
 const exHead = $(".ex-head"), exFinal = $("#ex-final");
 const callouts = $$("#callouts .co");
 
 /* ------------------------------------------------------------------ */
 /* Scroll state                                                         */
 /* ------------------------------------------------------------------ */
-const S = { heroK: 0, t: 0, onStage: true };
+const S = { heroK: 0, t: 0, shift: 0, onStage: true };
 function readScroll() {
   const vh = innerHeight;
   const top = stage.getBoundingClientRect().top;
   const s = -top / vh;                                   // viewports scrolled into the stage
   const heroH = hero.offsetHeight / vh;
-  const exH = explode.offsetHeight / vh;
+  const er = explode.getBoundingClientRect();
   S.heroK = clamp(s / heroH);                             // 0 → 1 while the hero scrolls away
-  S.t = clamp((s - heroH) / Math.max(0.5, exH - 1));      // 0 → 1 across the pinned exploded view
+  S.t = clamp(-er.top / Math.max(1, er.height - vh));     // 0 → 1 across the pinned exploded view
+  // pixels the exploded view is offset from its pinned spot while it scrolls in or out (the 3D canvas is fixed, so it rides along)
+  S.shift = (er.top > 0 && er.top < vh) ? er.top : Math.min(0, er.bottom - vh);
   S.onStage = stage.getBoundingClientRect().bottom > 0;
+  const jr = journeyEl ? journeyEl.getBoundingClientRect() : null;
+  S.covered = !!jr && jr.top <= 0 && jr.bottom >= vh;     // the journey section hides the bolt
   document.body.classList.toggle("past-stage", !S.onStage);
 }
 addEventListener("scroll", readScroll, { passive: true });
@@ -149,7 +153,7 @@ function startScene(renderer) {
     if (!running) return;
     requestAnimationFrame(frame);
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
-    if (!S.onStage || document.hidden) return;
+    if (!S.onStage || S.covered || document.hidden) return;
     time += reduceMotion ? 0 : dt;
     const f = reduceMotion ? 1 : 1 - Math.pow(0.002, dt);
     cur.heroK += (S.heroK - cur.heroK) * f;
@@ -159,7 +163,9 @@ function startScene(renderer) {
 
     /* layout: lying product shot under the hero text → upright and exploded → reassembled */
     const settle = smooth(0, 1, h);
-    anchor.position.set(0, mix(mobile ? -1.75 : -1.45, mobile ? 0.75 : -0.12, settle), 0);
+    const rise = 1 - smooth(0, 0.16, t);                    // starts low, clear of the "Take it apart" heading
+    anchor.position.set(0, mix(mobile ? -1.75 : -1.45, mobile ? 0.75 : -0.12, settle) - (mobile ? 0.8 : 1.0) * rise * settle, 0);
+    camera.setViewOffset(innerWidth, innerHeight, 0, -S.shift * settle, innerWidth, innerHeight);
     anchor.scale.setScalar(mix(mobile ? 0.55 : 0.82, mobile ? 0.5 : 0.82, settle));
     camera.position.z = mix(10, mix(10.5, 12.2, e), settle);
     px += (tx - px) * 0.05; py += (ty - py) * 0.05;
@@ -190,7 +196,7 @@ const tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
 function stepCallouts(ctx) {
   const t = ctx ? ctx.t : S.t;
   const e = ctx ? ctx.e : explodeK(t);
-  exHead.classList.toggle("away", e > 0.12);
+  exHead.classList.toggle("away", t > 0.1);
   exFinal.classList.toggle("on", t > 0.86);
   let cur = -1;
   callouts.forEach((li, i) => {
