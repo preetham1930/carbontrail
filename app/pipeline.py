@@ -38,11 +38,19 @@ def _models(primary: str) -> list:
     return out
 
 
-async def run_with_fallback(build, parts, primary: str, timeout: float, on_retry=None, **kw) -> dict:
+def _quota_error(e: Exception) -> bool:
+    t = f"{type(e).__name__} {e}"
+    return "ResourceExhausted" in t or "RESOURCE_EXHAUSTED" in t or "429" in t
+
+
+async def run_with_fallback(build, parts, primary: str, timeout: float, on_retry=None, backoff: float = 10.0, **kw) -> dict:
     """Run an agent; if the model is overloaded (429), unavailable or too slow, rebuild it on the next model.
+    A 429 usually means the project's per-minute quota is spent, so wait `backoff` seconds before the next try.
     `build(model)` must return a fresh agent; `on_retry(model, error)` resets any partial state."""
     last: Exception | None = None
     for i, m in enumerate(_models(primary)):
+        if i and last is not None and _quota_error(last) and backoff:
+            await asyncio.sleep(backoff)
         try:
             return await asyncio.wait_for(run_agent(build(m), parts, **kw), timeout)
         except Exception as e:  # noqa: BLE001
@@ -279,7 +287,7 @@ async def ask(question: str, run: Run | None) -> str:
                 + f"; precursor basis: {', '.join(p['basis'] for p in r['precursors'])}; country {run.profile.get('country')}.")
     try:
         out = await run_with_fallback(build_regulation_agent, [types.Part.from_text(text=question + case)],
-                                      config.MODEL_REASON, config.TIMEOUT_CHAT)
+                                      config.MODEL_REASON, config.TIMEOUT_CHAT, backoff=2.0)
         if out["text"].strip():
             return out["text"]
     except Exception:  # noqa: BLE001

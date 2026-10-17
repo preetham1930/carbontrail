@@ -33,4 +33,5 @@ USE_FIRESTORE = os.getenv("CT_FIRESTORE", "0") == "1"  # optional: persist run r
 ALLOW_SAMPLE_REPLAY = os.getenv("CT_ALLOW_SAMPLE_REPLAY", "1") == "1"
 
 MAX_UPLOAD_MB = int(os.getenv("CT_MAX_UPLOAD_MB", "15"))
-INTAKE_CONCURRENCY = int(os.getenv("CT_INTAKE_CONCURRENCY", "10"))
+# Documents read at once. Higher is faster but can exceed the project's per-minute Gemini token quota (429).
+INTAKE_CONCURRENCY = int(os.getenv("CT_INTAKE_CONCURRENCY", "5"))
