@@ -25,6 +25,20 @@ app = FastAPI(title="CarbonTrail", version="1.0")
 # Compress the page, scripts and the vendored 3D library (SSE streams are excluded by Starlette).
 app.add_middleware(GZipMiddleware, minimum_size=1024)
 
+
+@app.middleware("http")
+async def revalidate_static(request: Request, call_next):
+    """Pages, scripts and styles change with each deploy: browsers must check (ETag) before reusing a cached copy.
+    The vendored 3D library and the sample documents never change, so they may be cached for a day."""
+    response = await call_next(request)
+    path = request.url.path
+    if not path.startswith("/api/"):
+        if path.startswith("/vendor/") or path.startswith("/samples/") or path.startswith("/img/"):
+            response.headers.setdefault("Cache-Control", "public, max-age=86400")
+        else:
+            response.headers["Cache-Control"] = "no-cache"
+    return response
+
 if os.getenv("CT_DEV_SCRIPTED") == "1":  # offline UI development only
     from .agents import factory as _factory
     from .agents.devmodel import ScriptedLlm
