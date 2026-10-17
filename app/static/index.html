@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CarbonTrail · Paper in. Proof out.</title>
 <meta name="description" content="CarbonTrail turns a steel manufacturer's bills, invoices and handwritten registers into EU CBAM emissions data a verifier can trace to the source page.">
-<meta name="theme-color" content="#0B1012">
+<meta name="theme-color" content="#000000">
 <script>document.documentElement.classList.add("js");</script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/landing.css">
 <link rel="modulepreload" href="/vendor/three.module.min.js">
@@ -23,12 +23,13 @@
     <span>CarbonTrail</span>
   </a>
   <nav class="bar-nav" aria-label="Main">
-    <a class="nav-l only-landing" href="#how">How it works</a>
-    <a class="nav-l only-landing" href="#evidence">Evidence</a>
+    <a class="nav-l only-landing" href="#explode">How it works</a>
+    <a class="nav-l only-landing" href="#paper">Documents</a>
+    <a class="nav-l only-landing" href="#agents">Agents</a>
     <a class="nav-l only-landing" href="#stack">Google Cloud</a>
     <button class="nav-l" data-open="ask" type="button">Ask about CBAM</button>
     <a class="nav-l" href="https://github.com/preetham1930/carbontrail" id="repo-link" target="_blank" rel="noopener">GitHub</a>
-    <button class="btn primary small only-landing" data-run-demo type="button">Run the demo</button>
+    <button class="pill-btn only-landing" data-run-demo type="button">Run the demo</button>
   </nav>
 </header>
 
@@ -36,93 +37,101 @@
   <!-- ===================== Landing ===================== -->
   <section id="landing" class="landing" aria-label="CarbonTrail">
     <canvas id="scene" aria-hidden="true"></canvas>
-    <div class="scene-fallback" aria-hidden="true"></div>
 
-    <div class="story" id="story">
-      <section class="chapter" data-ch="0">
-        <div class="ch-inner hero">
-          <p class="eyebrow"><span class="dot"></span>EU CBAM · Iron &amp; steel · Built on Google Cloud</p>
-          <h1>Paper in.<br><span class="h1-proof">Proof out.</span></h1>
-          <p class="lede">CarbonTrail reads a steel exporter’s bills, invoices and handwritten registers, applies the EU method with exact code, and hands back emissions data a verifier can trace to the source page.</p>
-          <div class="cta-row">
-            <button class="btn primary" id="run-demo" data-run-demo type="button">Run the demo factory <span aria-hidden="true">→</span></button>
-            <label class="btn ghost-dark" for="file-input">Upload your documents</label>
-            <input type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.webp" hidden>
+    <!-- 3D stage: hero + exploded view share one canvas -->
+    <div class="stage3d" id="stage">
+      <section class="hero" id="hero">
+        <p class="hero-eyebrow">CarbonTrail</p>
+        <h1><span class="g-steel">Paper in.</span> <span class="g-proof">Proof out.</span></h1>
+        <p class="hero-sub">EU carbon border data for steel exporters,<br class="br-d"> built from the paperwork they already have.</p>
+        <div class="hero-ctas">
+          <button class="pill-btn big" id="run-demo" data-run-demo type="button">Run the demo factory</button>
+          <label class="text-link" for="file-input">Upload your documents <span aria-hidden="true">›</span></label>
+          <input type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.webp" hidden>
+        </div>
+        <p class="hero-note">Powered by Gemini 3.8 Flash and Google ADK on Cloud Run.</p>
+      </section>
+
+      <section class="explode" id="explode" aria-label="How CarbonTrail works, part by part">
+        <div class="explode-pin">
+          <div class="ex-head">
+            <p class="ex-eyebrow">How it works</p>
+            <h2 class="ex-title">Take it apart.</h2>
+            <p class="ex-sub">Five parts. One number you can prove.</p>
           </div>
-          <dl class="hero-meta">
-            <div><dt>Reads</dt><dd>Photos · PDFs · Hindi &amp; English</dd></div>
-            <div><dt>Reasons</dt><dd>Gemini 3.8 Flash · Google ADK</dd></div>
-            <div><dt>Runs on</dt><dd>Cloud Run · Vertex AI</dd></div>
-          </dl>
-        </div>
-        <a class="scroll-cue" href="#how" aria-label="Scroll to see how it works"><span></span>Scroll</a>
-      </section>
-
-      <section class="chapter" data-ch="1" id="how">
-        <div class="ch-inner">
-          <p class="kicker"><span class="num">01</span> The border has a carbon price</p>
-          <h2>Every bolt shipped to Europe now carries its carbon.</h2>
-          <p class="body">Since 1 January 2026, EU importers of steel pay for the emissions embedded in what they buy. The exporter’s own figure counts only if it follows the EU method and is verified. Otherwise the buyer pays on EU defaults, plus a penalty.</p>
-          <div class="stat-row">
-            <div class="stat"><b>€82.32</b><span>per tonne CO2e, CBAM certificate price, 2026-Q3</span></div>
-            <div class="stat ember"><b>+10% → 30%</b><span>mark-up on EU default values, 2026 to 2028</span></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="chapter" data-ch="2">
-        <div class="ch-inner">
-          <p class="kicker"><span class="num">02</span> The data already exists</p>
-          <h2>Every number the EU asks for is already in the factory, on paper.</h2>
-          <p class="body">Phone photos of LPG invoices. A mill’s statement of supplies. A production register written by hand in Hindi and English, with corrections in red ink. Small exporters have the data. They don’t have a carbon team.</p>
-          <ul class="paper-tags">
-            <li>LPG invoices</li><li>Diesel for the DG set</li><li>Wire rod statement</li><li>Electricity bill</li><li>Production register</li><li>Export invoices</li>
-          </ul>
-        </div>
-      </section>
-
-      <section class="chapter" data-ch="3">
-        <div class="ch-inner">
-          <p class="kicker"><span class="num">03</span> Agents read. Code calculates.</p>
-          <h2>Gemini reads every page. Agents check it like a verifier.</h2>
-          <ol class="pipeline">
-            <li data-step="0"><span class="pl-n">Read</span><span class="pl-t">Gemini extracts every quantity in parallel, with the exact quote and page.</span></li>
-            <li data-step="1"><span class="pl-n">Check</span><span class="pl-t">Scope, missing months, material balance, fuel use and shaky handwriting.</span></li>
-            <li data-step="2"><span class="pl-n">Calculate</span><span class="pl-t">The EU formulas run in exact code. The model never does arithmetic.</span></li>
-            <li data-step="3"><span class="pl-n">Prove</span><span class="pl-t">Every figure links back to its source, ready for the verifier.</span></li>
+          <ol class="callouts" id="callouts">
+            <li class="co" data-part="0" data-side="l"><span class="co-n">01 · Read</span><span class="co-t">Gemini reads every page.</span><span class="co-b">Photos, PDFs and handwriting in Hindi and English, each figure with its quote and page.</span><i class="co-line"></i></li>
+            <li class="co" data-part="1" data-side="r"><span class="co-n">02 · Check</span><span class="co-t">Agents audit like a verifier.</span><span class="co-b">Scope, missing months, the steel-in, bolts-out balance and which fuel went where.</span><i class="co-line"></i></li>
+            <li class="co" data-part="2" data-side="l"><span class="co-n">03 · Calculate</span><span class="co-t">Exact code, not the model.</span><span class="co-b">Em = AD × NCV × EF × OxF. The EU method, the same answer every time.</span><i class="co-line"></i></li>
+            <li class="co" data-part="3" data-side="r"><span class="co-n">04 · Trace</span><span class="co-t">Every figure threads back.</span><span class="co-b">Tap any number and the source document opens at the exact words Gemini read.</span><i class="co-line"></i></li>
+            <li class="co" data-part="4" data-side="l"><span class="co-n">05 · Prove</span><span class="co-t">Ready for the verifier.</span><span class="co-b">An Excel data pack shaped like the EU template, and a PDF evidence pack.</span><i class="co-line"></i></li>
           </ol>
-        </div>
-      </section>
-
-      <section class="chapter" data-ch="4">
-        <div class="ch-inner">
-          <p class="kicker"><span class="num">04</span> Proof out</p>
-          <h2>One verifiable number, and what it is worth.</h2>
-          <div class="proof-num"><b id="proof-count">5.36</b><span>tCO2e per tonne of fasteners</span></div>
-          <p class="body">On our demo factory, actual data beats the EU default. When the mill sends its verified figure, CarbonTrail recalculates: <strong>5.36 → 3.25</strong>, and the buyers’ exposure falls by <strong class="proof-eur">€37,948</strong> in a single quarter.</p>
-          <button class="btn primary" data-run-demo type="button">Watch it happen live <span aria-hidden="true">→</span></button>
+          <p class="ex-final" id="ex-final">Reassembled. Verified.</p>
         </div>
       </section>
     </div>
 
+    <!-- Everything below scrolls over the stage -->
     <div class="after">
-      <section class="sec" id="evidence">
-        <div class="sec-grid">
-          <div class="sec-copy reveal">
-            <p class="kicker light"><span class="num">05</span> Traceable by design</p>
-            <h2>Every number opens the page it came from.</h2>
-            <p class="body">Each step shows the formula, the working and an evidence chip. Click it and the photographed invoice opens beside the exact words Gemini read. Diesel burned in the generator is excluded automatically, because for steel only direct emissions count.</p>
-            <ul class="ticks">
-              <li>Formula, working and rule on every step</li>
-              <li>Low-confidence handwriting flagged for a human</li>
-              <li>Excel data pack in the shape of the EU template</li>
-            </ul>
+      <section class="sec light" id="why">
+        <div class="wrap">
+          <p class="sec-eyebrow reveal">Why now</p>
+          <h2 class="sec-title reveal">Carbon now has a price<br class="br-d"> at the EU border.</h2>
+          <div class="bento">
+            <article class="tile t-wide reveal"><p class="t-k">Since 1 January 2026</p><p class="t-big">CBAM is live.</p><p class="t-b">EU importers of steel, aluminium, cement and fertiliser now pay for the carbon embedded in what they buy.</p></article>
+            <article class="tile t-dark reveal"><p class="t-k">CBAM certificate, 2026-Q3</p><p class="t-big g-ember">€82.32</p><p class="t-b">per tonne of CO2e.</p></article>
+            <article class="tile reveal"><p class="t-k">No data, a penalty</p><p class="t-big t-nowrap">+10%<span class="t-arrow">→</span>30%</p><p class="t-b">mark-up on EU default values, 2026 to 2028.</p></article>
+            <article class="tile t-wide t-proof reveal"><p class="t-k">The way out</p><p class="t-big">Verified, own data.</p><p class="t-b">The exporter’s figure counts only if it follows the EU method and an accredited verifier can check it. CarbonTrail builds exactly that.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec dark" id="paper">
+        <div class="wrap">
+          <p class="sec-eyebrow reveal">The documents</p>
+          <h2 class="sec-title reveal">The data was always there.<br class="br-d"> On paper.</h2>
+        </div>
+        <div class="gallery" id="gallery" tabindex="0" aria-label="Documents CarbonTrail reads">
+          <figure class="g-card"><img src="/samples/07_production_register_q1.jpg" alt="Handwritten production register in Hindi and English" loading="lazy"><figcaption><b>A register written by hand.</b> Hindi and English, with a crossed-out 61.5 corrected to 62.5. Caught, and flagged for a human.</figcaption></figure>
+          <figure class="g-card"><img src="/samples/02_lpg_invoice_apr.jpg" alt="Photographed LPG invoice" loading="lazy"><figcaption><b>An LPG invoice, photographed.</b> 19,800 kg for the hardening furnace: a direct emission.</figcaption></figure>
+          <figure class="g-card"><img src="/samples/05_diesel_dg_statement.jpg" alt="Diesel statement for the generator" loading="lazy"><figcaption><b>Diesel for the generator.</b> Excluded automatically. For steel, electricity emissions don’t count.</figcaption></figure>
+          <figure class="g-card"><img src="/img/wire_rod_statement.jpg" alt="Steel mill statement of supplies" loading="lazy"><figcaption><b>The mill’s statement.</b> 270 t of wire rod: 87% of the footprint.</figcaption></figure>
+          <figure class="g-card"><img src="/samples/09_export_invoice_pl.jpg" alt="Export invoice to Poland" loading="lazy"><figcaption><b>Exports, sorted by border.</b> Germany and Poland count. The UK shipment is set aside.</figcaption></figure>
+          <figure class="g-card"><img src="/img/supplier_declaration.jpg" alt="Supplier emissions declaration" loading="lazy"><figcaption><b>The mill writes back.</b> A verified 2.36 replaces the 4.32 default, and the figure is recalculated.</figcaption></figure>
+        </div>
+        <div class="gal-ctrl">
+          <div class="dots" id="dots" aria-hidden="true"></div>
+          <div class="arrows"><button class="arrow" id="gal-prev" type="button" aria-label="Previous">‹</button><button class="arrow" id="gal-next" type="button" aria-label="Next">›</button></div>
+        </div>
+      </section>
+
+      <section class="sec dark proof" id="proof">
+        <div class="wrap center">
+          <p class="sec-eyebrow reveal">Proof out</p>
+          <p class="proof-big reveal"><span id="proof-count">5.36</span></p>
+          <p class="proof-unit reveal">tCO2e per tonne of fasteners, once the mill’s verified figure arrives.</p>
+          <div class="proof-row">
+            <div class="reveal"><b>€70,576</b><span>buyers’ exposure with the factory’s own data</span></div>
+            <div class="reveal"><b class="g-amber">€80,772</b><span>on EU default values</span></div>
+            <div class="reveal"><b class="g-proof">€37,948</b><span>less in one quarter, with the mill’s figure</span></div>
+          </div>
+          <p class="foot-ref reveal">Fictional demo factory, Ludhiana, April–June 2026. 160 t shipped to the EU at the 2026-Q3 price.<sup>1</sup></p>
+        </div>
+      </section>
+
+      <section class="sec light" id="evidence">
+        <div class="wrap ev-split">
+          <div class="reveal">
+            <p class="sec-eyebrow">Traceable by design</p>
+            <h2 class="sec-title">Every number opens the page it came from.</h2>
+            <p class="sec-body">Each step shows the formula, the working and an evidence chip. Tap it and the photographed invoice opens beside the exact words Gemini read.</p>
+            <button class="text-link dark" data-run-demo type="button">See it on the demo factory <span aria-hidden="true">›</span></button>
           </div>
           <div class="tilt-wrap reveal" id="tilt">
             <div class="tilt">
               <img class="tilt-doc" src="/samples/02_lpg_invoice_apr.jpg" alt="Photographed LPG invoice from the demo factory" loading="lazy">
               <div class="tilt-card">
-                <p class="tc-k">Step 1 · Combustion emissions, LPG</p>
+                <p class="tc-k">Step 1 · Combustion, LPG</p>
                 <p class="tc-f">Em = AD × NCV × EF × OxF</p>
                 <p class="tc-w">19.8 t × 47.3 GJ/t × 63.1 tCO2/TJ × 1.0 = <b>59.10 tCO2</b></p>
                 <p class="tc-q"><span class="ev-chip">E4</span>“LPG (bulk) for industrial use … 19,800 KG”</p>
@@ -132,59 +141,63 @@
         </div>
       </section>
 
-      <section class="sec sec-dark" id="agents">
-        <div class="sec-head reveal">
-          <p class="kicker"><span class="num">06</span> Google Agent Development Kit</p>
-          <h2>Six agents. One exact engine.</h2>
-          <p class="body">The agents read, check, explain and act. Every number they quote comes back from a deterministic tool, so the answer is the same every time.</p>
-        </div>
-        <div class="agents-grid">
-          <article class="agent reveal"><p class="ag-n">Document intake <span>×N in parallel</span></p><p>Multimodal reading with Gemini’s structured output: quantity, unit, quote, page, confidence.</p><code>output_schema</code></article>
-          <article class="agent reveal"><p class="ag-n">Scope &amp; quality</p><p>Checks CBAM scope, coverage, wire-rod balance, yield and fuel attribution, then records findings.</p><code>run_data_quality_checks</code></article>
-          <article class="agent reveal"><p class="ag-n">Calculation</p><p>Runs the EU method through the engine and explains it like a verifier would.</p><code>calculate_embedded_emissions</code></article>
-          <article class="agent reveal"><p class="ag-n">Advisor</p><p>Turns the figure into euros and tests levers: supplier, furnace fuel, yield, reporting year.</p><code>simulate_scenario</code></article>
-          <article class="agent reveal"><p class="ag-n">Supplier data</p><p>Drafts the request to the steel mill for its verified, installation-level figure.</p><code>supplier_request</code></article>
-          <article class="agent reveal"><p class="ag-n">Regulation</p><p>Answers CBAM questions from curated notes, with a citation for every claim.</p><code>[K1…K16]</code></article>
-        </div>
-      </section>
-
-      <section class="sec" id="stack">
-        <div class="sec-head reveal">
-          <p class="kicker light"><span class="num">07</span> Architecture</p>
-          <h2>Built on Google Cloud, end to end.</h2>
-        </div>
-        <div class="arch reveal" role="img" aria-label="Browser connects to a Cloud Run service running FastAPI and Google ADK agents, which call Gemini on Vertex AI, store documents in Cloud Storage and results in Firestore.">
-          <div class="arch-node"><p class="an-k">Client</p><p class="an-t">Browser</p><p class="an-s">Upload · live agent trace (SSE)</p></div>
-          <div class="arch-link"></div>
-          <div class="arch-node core"><p class="an-k">Cloud Run · asia-south1</p><p class="an-t">FastAPI + Google ADK</p><p class="an-s">Intake ×N → quality → calculation → advisor</p><p class="an-s mono">Deterministic CBAM engine · reference data with sources</p></div>
-          <div class="arch-link"></div>
-          <div class="arch-side">
-            <div class="arch-node"><p class="an-k">Vertex AI</p><p class="an-t">Gemini 3.8 Flash</p><p class="an-s">Global endpoint · no API keys</p></div>
-            <div class="arch-node"><p class="an-k">Cloud Storage</p><p class="an-t">Documents</p></div>
-            <div class="arch-node"><p class="an-k">Firestore</p><p class="an-t">Run results</p></div>
+      <section class="sec light2" id="agents">
+        <div class="wrap">
+          <p class="sec-eyebrow reveal">Google Agent Development Kit</p>
+          <h2 class="sec-title reveal">Six agents. One exact engine.</h2>
+          <div class="agents">
+            <article class="ag-tile reveal"><p class="ag-k">×N in parallel</p><h3>Document intake</h3><p>Reads each photo or PDF with Gemini’s structured output: quantity, unit, quote, page, confidence.</p></article>
+            <article class="ag-tile reveal"><p class="ag-k">Verifier mindset</p><h3>Scope &amp; quality</h3><p>Checks CBAM scope, coverage, wire-rod balance and fuel use, then records findings.</p></article>
+            <article class="ag-tile reveal"><p class="ag-k">Tools only</p><h3>Calculation</h3><p>Runs the EU method through the engine and explains every step.</p></article>
+            <article class="ag-tile reveal"><p class="ag-k">Euros, not jargon</p><h3>Advisor</h3><p>Tests levers: a cleaner mill, a different furnace fuel, less scrap, a later year.</p></article>
+            <article class="ag-tile reveal"><p class="ag-k">Closes the gap</p><h3>Supplier data</h3><p>Drafts the request to the steel mill for its verified, installation-level figure.</p></article>
+            <article class="ag-tile reveal"><p class="ag-k">Cited answers</p><h3>Regulation</h3><p>Answers CBAM questions from curated notes, with a citation for every claim.</p></article>
           </div>
         </div>
       </section>
 
-      <section class="band" aria-label="Results on the demo factory">
-        <div class="band-item reveal"><b>10</b><span>documents read in parallel</span></div>
-        <div class="band-item reveal"><b>~20 s</b><span>to the first verified figure</span></div>
-        <div class="band-item reveal"><b>3.25</b><span>tCO2e/t with the mill’s data</span></div>
-        <div class="band-item reveal"><b>€37,948</b><span>less exposure in one quarter</span></div>
+      <section class="sec light" id="stack">
+        <div class="wrap center">
+          <p class="sec-eyebrow reveal">Architecture</p>
+          <h2 class="sec-title reveal">Built on Google Cloud.<br class="br-d"> End to end.</h2>
+          <div class="arch reveal" role="img" aria-label="Browser to Cloud Run running FastAPI and Google ADK, which calls Gemini on Vertex AI and stores documents in Cloud Storage and results in Firestore.">
+            <div class="ar-node"><span>Client</span><b>Browser</b><em>Upload · live agent trace</em></div>
+            <i class="ar-link"></i>
+            <div class="ar-node core"><span>Cloud Run</span><b>FastAPI + Google ADK</b><em>Deterministic CBAM engine inside</em></div>
+            <i class="ar-link"></i>
+            <div class="ar-col">
+              <div class="ar-node"><span>Vertex AI</span><b>Gemini 3.8 Flash</b></div>
+              <div class="ar-node"><span>Cloud Storage</span><b>Documents</b></div>
+              <div class="ar-node"><span>Firestore</span><b>Results</b></div>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <section class="final reveal">
-        <h2>See it on the demo factory.</h2>
-        <p class="body">Ten fictional but realistic documents from a fastener exporter in Ludhiana, April to June 2026. Watch the agents work, open the evidence, then send the mill’s reply.</p>
-        <div class="cta-row center">
-          <button class="btn primary" data-run-demo type="button">Run the demo factory <span aria-hidden="true">→</span></button>
-          <label class="btn ghost-dark" for="file-input">Upload your documents</label>
+      <section class="sec dark final" id="final">
+        <div class="wrap center">
+          <h2 class="final-title reveal"><span class="g-steel">Paper in.</span> <span class="g-proof">Proof out.</span></h2>
+          <p class="sec-body reveal">Ten realistic documents from a fastener exporter in Ludhiana. Watch the agents work, open the evidence, then send the mill’s reply.</p>
+          <div class="hero-ctas reveal">
+            <button class="pill-btn big" data-run-demo type="button">Run the demo factory</button>
+            <label class="text-link" for="file-input">Upload your documents <span aria-hidden="true">›</span></label>
+          </div>
         </div>
       </section>
 
       <footer class="foot">
-        <p><b>CarbonTrail</b> by Team Verdant · Preetham Kukkadapu &amp; Harshitha Neelam · Google Cloud AI Builder Cup 2026</p>
-        <p class="muted-d">Sources: Regulation (EU) 2023/956; Implementing Regulations (EU) 2025/2547 and 2025/2621; IPCC 2006 Guidelines. CarbonTrail prepares verification-ready data; it does not replace the accredited verifier.</p>
+        <div class="wrap">
+          <ol class="foot-notes">
+            <li>The demo factory, Verkam Fasteners Pvt. Ltd., and all its documents are fictional. Gross exposure is shown before the free-allocation adjustment.</li>
+            <li>Sources: Regulation (EU) 2023/956; Implementing Regulations (EU) 2025/2547 and 2025/2621; quarterly CBAM certificate prices; IPCC 2006 Guidelines. CarbonTrail prepares verification-ready data; it does not replace the accredited verifier or the EU declarant.</li>
+          </ol>
+          <div class="foot-cols">
+            <div><p>Product</p><a href="#explode">How it works</a><a href="#paper">Documents</a><button type="button" class="foot-btn" data-run-demo>Run the demo</button></div>
+            <div><p>Technology</p><a href="#agents">Agents</a><a href="#stack">Google Cloud</a><a href="https://github.com/preetham1930/carbontrail" target="_blank" rel="noopener">Source code</a></div>
+            <div><p>Team Verdant</p><span>Preetham Kukkadapu</span><span>Harshitha Neelam</span><span>Google Cloud AI Builder Cup 2026</span></div>
+          </div>
+          <p class="foot-copy">CarbonTrail · Manufacturing track · Built with Gemini, Google ADK and Cloud Run.</p>
+        </div>
       </footer>
     </div>
   </section>

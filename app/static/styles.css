@@ -33,7 +33,11 @@
   --radius-s: 6px;
   --radius-m: 14px;
   --shadow: 0 1px 2px rgba(16, 24, 28, .05), 0 12px 32px -18px rgba(16, 24, 28, .25);
-  --font: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  --blue: #0071E3;
+  --blue-hover: #0077ED;
+  --link: #0066CC;
+  --link-dark: #2997FF;
   --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", monospace;
   --ease: cubic-bezier(.2, .8, .2, 1);
 }
@@ -50,7 +54,7 @@ body {
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
 }
-body.mode-landing { background: var(--g0); color: var(--fog); }
+body.mode-landing { background: #000; color: #F5F5F7; }
 h1, h2, h3 { margin: 0; line-height: 1.12; }
 p { margin: 0 0 .6em; }
 button, input, select, textarea { font: inherit; color: inherit; }
@@ -64,19 +68,23 @@ button, input, select, textarea { font: inherit; color: inherit; }
 /* ---------- Top bar ---------- */
 .bar {
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  padding: 12px clamp(16px, 4vw, 40px);
-  background: rgba(11, 16, 18, .86);
-  -webkit-backdrop-filter: saturate(140%) blur(14px); backdrop-filter: saturate(140%) blur(14px);
-  border-bottom: 1px solid rgba(232, 238, 236, .08);
-  color: var(--fog);
+  height: 52px; padding: 0 max(22px, calc((100vw - 1024px) / 2));
+  background: rgba(22, 22, 23, .8);
+  -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+  color: #F5F5F7;
   position: sticky; top: 0; z-index: 30;
 }
-.brand { display: flex; align-items: center; gap: 10px; color: var(--fog); text-decoration: none;
-  font-weight: 800; font-stretch: 115%; font-size: 1.12rem; letter-spacing: -.01em; }
-.brand svg { width: 28px; height: 28px; color: var(--fog); }
-.bar-nav { display: flex; gap: clamp(10px, 2vw, 26px); align-items: center; }
-.nav-l { background: none; border: 0; padding: 6px 0; color: rgba(232, 238, 236, .78); cursor: pointer; text-decoration: none; font-weight: 500; font-size: .95rem; transition: color .15s; }
+.brand { display: flex; align-items: center; gap: 9px; color: #F5F5F7; text-decoration: none;
+  font-weight: 600; font-size: 21px; letter-spacing: .011em; }
+.brand svg { width: 24px; height: 24px; color: #F5F5F7; }
+.bar-nav { display: flex; gap: clamp(14px, 2.2vw, 28px); align-items: center; }
+.nav-l { white-space: nowrap; background: none; border: 0; padding: 6px 0; color: rgba(245, 245, 247, .8); cursor: pointer; text-decoration: none; font-weight: 400; font-size: 12px; letter-spacing: -.01em; transition: color .2s; }
 .nav-l:hover { color: #fff; }
+.pill-btn { display: inline-flex; align-items: center; justify-content: center; border: 0; cursor: pointer; background: var(--blue); color: #fff; font-size: 12px; font-weight: 400; letter-spacing: -.01em; line-height: 1.33; padding: 4px 11px; border-radius: 980px; transition: background .2s; white-space: nowrap; }
+.pill-btn:hover { background: var(--blue-hover); }
+.pill-btn.big { font-size: 17px; padding: 11px 22px; line-height: 1.18; }
+.pill-btn[disabled] { opacity: .6; cursor: progress; }
 .mode-work .only-landing { display: none; }
 
 /* ---------- Buttons ---------- */
@@ -89,8 +97,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .btn:hover { transform: translateY(-1px); border-color: var(--ink); }
 .btn:active { transform: translateY(0); }
-.btn.primary { background: var(--ember); border-color: var(--ember); color: #1A0D06; box-shadow: 0 10px 30px -10px rgba(255, 106, 43, .65); }
-.btn.primary:hover { background: #FF7D45; border-color: #FF7D45; box-shadow: 0 14px 36px -10px rgba(255, 106, 43, .8); }
+.btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+.btn.primary:hover { background: var(--blue-hover); border-color: var(--blue-hover); }
 .btn.ghost { background: transparent; }
 .btn.ghost-dark { background: rgba(232, 238, 236, .04); border-color: rgba(232, 238, 236, .22); color: var(--fog); }
 .btn.ghost-dark:hover { border-color: rgba(232, 238, 236, .6); background: rgba(232, 238, 236, .08); }
