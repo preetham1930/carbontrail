@@ -39,6 +39,11 @@
     "verify": true,
     "7213": {"description": "Bars and rods, hot-rolled, in irregularly wound coils (wire rod)", "values": {"India": 4.32}}
   },
+  "free_allocation_benchmark": {
+    "_source": "IR (EU) 2025/2620 Annex, column B default benchmark for fasteners (route C, BF-BOF), tCO2e/t of good; the value applied with default values. Cross-checked against the EFDA 'CBAM costs calculation in 2026' guide.",
+    "731815": 1.364,
+    "731816": 1.364
+  },
   "benchmarks_info": {
     "_source": "IR (EU) 2025/2620, CN 7213/7214 20 00 row, tCO2e/t (shown for context only)",
     "7213": {"BF-BOF": 1.364, "DRI-EAF": 0.475, "Scrap-EAF": 0.066}

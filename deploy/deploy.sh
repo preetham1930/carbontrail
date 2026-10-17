@@ -31,6 +31,9 @@ gcloud projects add-iam-policy-binding "$PROJECT" --member "serviceAccount:${PNU
 echo "== Cloud Storage bucket for uploaded documents"
 gcloud storage buckets describe "gs://$BUCKET" >/dev/null 2>&1 || \
   gcloud storage buckets create "gs://$BUCKET" --location "$REGION" --uniform-bucket-level-access
+# Uploaded documents are deleted automatically one day after upload (lifecycle runs within about a day).
+echo '{"rule":[{"action":{"type":"Delete"},"condition":{"age":1}}]}' > /tmp/ct-lifecycle.json
+gcloud storage buckets update "gs://$BUCKET" --lifecycle-file=/tmp/ct-lifecycle.json
 
 echo "== Firestore (Native mode) for run results"
 gcloud firestore databases describe --database='(default)' >/dev/null 2>&1 || \

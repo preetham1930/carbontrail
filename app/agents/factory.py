@@ -134,6 +134,8 @@ def build_analysis_pipeline(ctx: "AnalysisContext", model=None) -> SequentialAge
             "total_gross_cost_actual_eur": _r(r["totals"]["gross_cost_actual_eur"], 0),
             "total_gross_cost_default_eur": _r(r["totals"]["gross_cost_default_eur"], 0),
             "saving_vs_default_eur": _r(r["totals"]["saving_eur"], 0),
+            "estimated_net_payable_actual_eur": _r(r["totals"].get("net_cost_actual_eur"), 0),
+            "estimated_net_payable_default_eur": _r(r["totals"].get("net_cost_default_eur"), 0),
             "note": r["free_allocation_note"],
         }
 

@@ -1,6 +1,6 @@
 // CarbonTrail — "the journey": one container of bolts from a factory in Ludhiana to a buyer in Germany.
 // Scroll-driven 3D diorama in a clay style. The EU border check is the climax: amber on EU defaults,
-// green once CarbonTrail's verified data travels with the goods.
+// green once CarbonTrail's actual, verifier-ready data travels with the goods.
 import * as THREE from "/vendor/three.module.min.js";
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -34,14 +34,17 @@ function init() {
       prog.forEach((el, i) => { el.classList.toggle("on", i === s); el.classList.toggle("done", i < s); });
       lastStage = s;
     }
+    // container label: undocumented at the factory, EU default at the border, actual data once the proof arrives
     const verified = p >= 0.82;
-    if (verified !== lastVerified) {
+    const tagState = verified ? 2 : p >= 0.66 ? 1 : 0;
+    if (tagState !== lastVerified) {
       bill.classList.toggle("verified", verified);
       carbonTag.classList.toggle("verified", verified);
-      billEur.textContent = verified ? "€42,824" : "€80,772";
-      billNote.textContent = verified ? "Verified data via CarbonTrail" : "EU default + 10% mark-up";
-      carbonTag.innerHTML = verified ? "<b>3.25</b> tCO2e per tonne · verified" : "<b>5.36</b> tCO2e per tonne, inside";
-      lastVerified = verified;
+      carbonTag.classList.toggle("assumed", tagState === 1);
+      billEur.textContent = verified ? "€39,162" : "€73,865";
+      billNote.textContent = verified ? "Gross · actual data, ready for the verifier" : "Gross · EU default + 10% mark-up";
+      carbonTag.innerHTML = ["Carbon inside: <b>not yet documented</b>", "<b>6.13</b> tCO2e/t · EU default + 10%", "<b>3.25</b> tCO2e/t · actual data"][tagState];
+      lastVerified = tagState;
     }
   }
 
@@ -185,7 +188,7 @@ function init() {
 
   /* the factory's paperwork, flying into the container */
   const loader = new THREE.TextureLoader();
-  const papers = ["02_lpg_invoice_apr.jpg", "07_production_register_q1.jpg", "05_diesel_dg_statement.jpg"].map((f, i) => {
+  const papers = ["02_lpg_invoice_apr.jpg", "07_production_register_apr-jun.jpg", "05_diesel_dg_statement.jpg"].map((f, i) => {
     const mat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false, toneMapped: false });
     loader.load(`/samples/${f}`, (t) => { t.colorSpace = THREE.SRGBColorSpace; mat.map = t; mat.needsUpdate = true; });
     const m = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.15), mat);

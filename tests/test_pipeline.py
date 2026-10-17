@@ -67,7 +67,7 @@ def test_full_pipeline():
     asyncio.run(pipeline.analyse(run, [new]))
     assert run.status == "done", run.error
     assert round(run.result["see"], 4) == 3.2514
-    assert run.result["totals"]["saving_eur"] > 37000
+    assert run.result["totals"]["saving_eur"] > 34500
 
     draft = asyncio.run(pipeline.draft_supplier_request(run, "Ops Head", None))
     assert draft["subject"]

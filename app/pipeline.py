@@ -14,6 +14,7 @@ from typing import Any
 from google.genai import types
 
 from . import config, storage
+from .agents import factory as _factory
 from .agents.factory import (AnalysisContext, build_analysis_pipeline, build_intake_agent,
                              build_regulation_agent, build_supplier_agent)
 from .agents.runtime import parse_json, run_agent
@@ -24,6 +25,33 @@ from .schemas import DocumentExtraction
 
 log = logging.getLogger("carbontrail")
 GOLDEN_DIR = Path(__file__).resolve().parent.parent / "samples" / "golden"
+
+
+def _models(primary: str) -> list:
+    """Primary model first, then the fallbacks. In offline dev mode the scripted model is used as is."""
+    if _factory.MODEL_OVERRIDE is not None:
+        return [None]
+    out = [primary]
+    for m in config.MODEL_FALLBACKS:
+        if m not in out:
+            out.append(m)
+    return out
+
+
+async def run_with_fallback(build, parts, primary: str, timeout: float, on_retry=None, **kw) -> dict:
+    """Run an agent; if the model is overloaded (429), unavailable or too slow, rebuild it on the next model.
+    `build(model)` must return a fresh agent; `on_retry(model, error)` resets any partial state."""
+    last: Exception | None = None
+    for i, m in enumerate(_models(primary)):
+        try:
+            return await asyncio.wait_for(run_agent(build(m), parts, **kw), timeout)
+        except Exception as e:  # noqa: BLE001
+            last = e
+            kind = "timed out" if isinstance(e, asyncio.TimeoutError) else type(e).__name__
+            log.warning("agent attempt on %s failed (%s): %s", m, kind, str(e)[:200])
+            if on_retry and i + 1 < len(_models(primary)):
+                await on_retry(m, kind)
+    raise last or RuntimeError("no model available")
 
 
 @dataclass
@@ -115,12 +143,11 @@ async def _intake_one(run: Run, doc: Doc, sem: asyncio.Semaphore) -> None:
     async with sem:
         await run.emit({"type": "doc_start", "doc": doc.id, "name": doc.name, "agent": "document_intake_agent"})
         try:
-            agent = build_intake_agent()
             parts = [
                 types.Part.from_text(text=f"Document file name: {doc.name}. Reporting period of interest: {run.profile.get('period_start')} to {run.profile.get('period_end')}."),
                 types.Part.from_bytes(data=doc.data, mime_type=doc.mime),
             ]
-            out = await run_agent(agent, parts, label=doc.id)
+            out = await run_with_fallback(build_intake_agent, parts, config.MODEL_INTAKE, config.TIMEOUT_INTAKE, label=doc.id)
             raw = out["state"].get("extraction") or parse_json(out["text"])
             doc.extraction = DocumentExtraction.model_validate(raw)
             doc.source = "gemini"
@@ -172,10 +199,16 @@ async def analyse(run: Run, docs: list[Doc] | None = None, agents: bool = True) 
         if agents:
             await run.emit({"type": "stage", "stage": "agents", "text": "Scope & quality -> calculation -> advice"})
             try:
-                out = await run_agent(build_analysis_pipeline(run.ctx), [types.Part.from_text(
-                    text=f"Analyse the CBAM data for {run.profile.get('company', 'the factory')} ({run.profile.get('country', 'India')}), "
-                         f"reporting period {run.profile.get('period_start')} to {run.profile.get('period_end')}.")],
-                    emit=run.emit)
+                async def _reset(model, kind):
+                    run.ctx.agent_findings.clear()
+                    run.ctx.agent_scenarios.clear()
+                    await run.emit({"type": "warning", "text": f"Gemini {model} is busy ({kind}); the agents are retrying on a backup Gemini model."})
+                out = await run_with_fallback(
+                    lambda m: build_analysis_pipeline(run.ctx, m),
+                    [types.Part.from_text(
+                        text=f"Analyse the CBAM data for {run.profile.get('company', 'the factory')} ({run.profile.get('country', 'India')}), "
+                             f"reporting period {run.profile.get('period_start')} to {run.profile.get('period_end')}.")],
+                    config.MODEL_REASON, config.TIMEOUT_AGENTS, on_retry=_reset, emit=run.emit)
                 st = out["state"]
                 run.briefs = {"quality": st.get("quality_review", out["texts"].get("scope_quality_agent", "")),
                               "calculation": st.get("calc_review", out["texts"].get("calculation_agent", "")),
@@ -203,9 +236,11 @@ def fallback_briefs(run: Run) -> dict:
         "source": "deterministic",
         "quality": f"{len(run.findings)} automated checks ran; see the findings list.",
         "calculation": f"SEE {see:.3f} tCO2e/t; {prec:.0%} of embedded emissions come from purchased precursors.",
-        "advice": (f"### What this means for you\nGross exposure on this period's EU shipments: EUR {t.get('gross_cost_actual_eur', 0):,.0f} "
-                   f"with your data vs EUR {t.get('gross_cost_default_eur', 0):,.0f} on EU default values.\n"
-                   "### Do this next\n- Ask your wire rod supplier for verified installation-level emissions data."),
+        "advice": (f"### What this means for you\nGross CBAM cost of this period's EU shipments: EUR {t.get('gross_cost_actual_eur', 0):,.0f} "
+                   f"with your data vs EUR {t.get('gross_cost_default_eur', 0):,.0f} on EU default values, a saving of EUR {t.get('saving_eur') or 0:,.0f}. "
+                   + (f"After the free-allocation adjustment the buyers pay an estimated EUR {t['net_cost_actual_eur']:,.0f} vs EUR {t['net_cost_default_eur']:,.0f}.\n"
+                      if t.get("net_cost_actual_eur") is not None else "\n")
+                   + "### Do this next\n- Ask your wire rod supplier for verified installation-level emissions data."),
     }
 
 
@@ -220,7 +255,13 @@ async def draft_supplier_request(run: Run, sender: str, supplier: str | None) ->
         "period": f"{ci.period_start} to {ci.period_end}",
         "eu_default_used_now": p.see_actual is None if p else True,
     }
-    out = await run_agent(build_supplier_agent(), [types.Part.from_text(text="Facts: " + json.dumps(facts))], emit=run.emit)
+    try:
+        out = await run_with_fallback(build_supplier_agent, [types.Part.from_text(text="Facts: " + json.dumps(facts))],
+                                      config.MODEL_REASON, config.TIMEOUT_CHAT * 2, emit=run.emit)
+    except Exception:  # noqa: BLE001
+        log.exception("supplier agent unavailable; using the template")
+        run.supplier_request = _supplier_template(facts)
+        return run.supplier_request
     try:
         data = parse_json(out["text"])
         run.supplier_request = {"subject": data.get("subject", ""), "body": data.get("body", ""), "facts": facts}
@@ -236,8 +277,51 @@ async def ask(question: str, run: Run | None) -> str:
         case = (f"\n\nCASE DATA (from the user's analysis): SEE {r['see']:.3f} tCO2e/t; goods "
                 + ", ".join(f"{g['cn']} exported {g['export_eu_t']:.1f} t" for g in r["goods"])
                 + f"; precursor basis: {', '.join(p['basis'] for p in r['precursors'])}; country {run.profile.get('country')}.")
-    out = await run_agent(build_regulation_agent(), [types.Part.from_text(text=question + case)])
-    return out["text"]
+    try:
+        out = await run_with_fallback(build_regulation_agent, [types.Part.from_text(text=question + case)],
+                                      config.MODEL_REASON, config.TIMEOUT_CHAT)
+        if out["text"].strip():
+            return out["text"]
+    except Exception:  # noqa: BLE001
+        log.exception("regulation agent unavailable; answering from the notes")
+    return notes_answer(question)
+
+
+def notes_answer(question: str, k: int = 3) -> str:
+    """Fallback when Gemini is unavailable: return the curated notes that best match the question, with their IDs."""
+    import re
+    from .agents.factory import _KNOWLEDGE
+    notes = re.findall(r"^\[(K\d+)\]\s*(.+)$", _KNOWLEDGE, re.M)
+    stop = set("a an the is are do does did my our your i we to of in on for and or what when how which who why can will be it this that with by at from as".split())
+    words = {w for w in re.findall(r"[a-z0-9]+", question.lower()) if w not in stop and len(w) > 2}
+    related = {"pay": "price certificate certificates declaration sales surrender", "paid": "price certificate declaration",
+               "cost": "price certificate default mark-up", "when": "due date 2027 from", "deadline": "due date 2027",
+               "default": "mark-up default values", "verify": "verified verifier accredited", "verified": "verifier accredited"}
+    for w in list(words):
+        words |= set(related.get(w, "").split())
+    def score(text):
+        t = text.lower()
+        return sum(2 if w in t.split() else 1 for w in words if w in t)
+    ranked = sorted(notes, key=lambda n: score(n[1]), reverse=True)
+    best = [n for n in ranked[:k] if score(n[1]) > 0] or ranked[:1]
+    body = "\n".join(f"- {re.sub(r'Source:.*$', '', text).strip()} [{nid}]" for nid, text in best)
+    return ("Gemini is busy right now, so here are the regulation notes that match your question most closely:\n"
+            + body + "\nAsk again in a minute for a full answer.")
+
+
+def _supplier_template(facts: dict) -> dict:
+    t = facts.get("tonnes_supplied")
+    body = (f"Dear {facts.get('supplier') or 'Sir/Madam'},\n\n"
+            f"We are preparing EU CBAM emissions data for our exports. For the {facts.get('material', 'wire rod')} (CN {facts.get('cn_code', '7213')}) "
+            f"you supplied to us{f' ({t} t)' if t else ''} in the period {facts.get('period')}, could you please share, for the producing installation:\n"
+            "1. The specific embedded emissions (direct) in tCO2e per tonne, calculated with the EU CBAM method (IR (EU) 2025/2547).\n"
+            "2. The installation name, location and production route.\n"
+            "3. Whether the figure has been verified by an accredited verifier, with the verification report if available.\n"
+            "4. Any carbon price effectively paid for these emissions.\n\n"
+            "Without your figure our buyers must use the EU default value plus a mark-up, which raises their CBAM cost.\n\n"
+            f"Kind regards,\n{facts.get('sender_name') or ''}\n{facts.get('sender_company') or ''}")
+    return {"subject": f"CBAM emissions data for {facts.get('material', 'wire rod')} supplied, {facts.get('period')}",
+            "body": body, "facts": facts, "source": "template"}
 
 
 def scenario(run: Run, params: dict) -> dict:

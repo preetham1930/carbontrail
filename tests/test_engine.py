@@ -25,7 +25,7 @@ def demo_input(supplier_see=None):
         precursors=[PrecursorInput("p1", "7213", "Wire rod", 262.3, "Mill",
                                    see_actual=supplier_see, see_actual_verified=supplier_see is not None)],
         electricity_mwh=412.6,
-        price_quarter="2026-Q3",
+        price_quarter="2026-Q2",
     )
 
 
@@ -64,15 +64,33 @@ def test_see_with_supplier_data():
 def test_costs_and_saving():
     r = calculate(demo_input(supplier_see=2.36))
     see = r["see"]
-    price = 82.32
+    price = 75.28
     assert r["price"]["eur_per_t"] == price
     actual = 160.0 * see * price
     default = (120.0 * 5.72 * 1.10 + 40.0 * 5.14 * 1.10) * price
     assert math.isclose(r["totals"]["gross_cost_actual_eur"], actual, rel_tol=1e-9)
     assert math.isclose(r["totals"]["gross_cost_default_eur"], default, rel_tol=1e-9)
     assert math.isclose(r["totals"]["saving_eur"], default - actual, rel_tol=1e-9)
-    # Sanity: EUR 80.8k gross exposure on defaults vs EUR 42.8k on actual data per quarter
-    assert 37500 < r["totals"]["saving_eur"] < 38500
+    # Sanity: EUR 73.9k gross exposure on defaults vs EUR 39.2k on actual data per quarter
+    assert 34500 < r["totals"]["saving_eur"] < 34900
+
+
+def test_price_follows_the_import_quarter():
+    inp = demo_input(supplier_see=2.36)
+    inp.price_quarter = None              # derive from the period: April-June -> Q2
+    r = calculate(inp)
+    assert r["price"] == {"eur_per_t": 75.28, "quarter": "2026-Q2"}
+
+
+def test_free_allocation_adjustment():
+    r = calculate(demo_input(supplier_see=2.36))
+    t = r["totals"]
+    fa = 160.0 * 0.975 * 1.364            # default benchmark for fasteners, 2026 CBAM factor
+    assert math.isclose(t["free_allocation_t"], fa, rel_tol=1e-9)
+    assert math.isclose(t["net_cost_actual_eur"], (160.0 * r["see"] - fa) * 75.28, rel_tol=1e-9)
+    assert math.isclose(t["net_cost_default_eur"], ((120.0 * 5.72 + 40.0 * 5.14) * 1.10 - fa) * 75.28, rel_tol=1e-9)
+    # the adjustment lowers both bills equally, so the saving is unchanged
+    assert math.isclose(t["net_cost_default_eur"] - t["net_cost_actual_eur"], t["saving_eur"], rel_tol=1e-9)
 
 
 def test_scenarios():

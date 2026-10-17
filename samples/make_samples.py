@@ -378,7 +378,7 @@ def wire_rod_pdf():
                cn_code="7213 91 90", party="Shivalik Wire & Steel Ltd.", period_start="2026-05-16", period_end="2026-05-16"),
           item("precursor_purchase", "Hot rolled steel wire rod SAE1018 12.0 mm", 84.76, "MT", "SWS/WR/1502 12-06-2026 SAE1018 / 12.0 mm 72139190 84.760",
                cn_code="7213 91 90", party="Shivalik Wire & Steel Ltd.", period_start="2026-06-12", period_end="2026-06-12")]
-    save("01_wire_rod_supplies_q1.pdf", buf.getvalue(), "application/pdf", "Wire rod statement of supplies, Apr-Jun (PDF)", {
+    save("01_wire_rod_supplies_apr-jun.pdf", buf.getvalue(), "application/pdf", "Wire rod statement of supplies, Apr-Jun (PDF)", {
         "doc_type": "precursor_purchase_invoice", "issuer": "Shivalik Wire & Steel Ltd.", "recipient": BUYER, "document_number": None,
         "document_date": "2026-06-30", "period_start": "2026-04-01", "period_end": "2026-06-30", "languages": ["English"],
         "line_items": li, "reading_notes": ["Supplier states BF-BOF route; emissions data available on request."]}, kind="precursor")
@@ -428,7 +428,7 @@ def register_photo():
                     confidence=0.72 if m == "05" else 0.93),
                item("production", "Nuts (7318 16)", float(n), "MT", q(mon, n), cn_code="7318 16", period_start=ps, period_end=pe),
                item("scrap", "Process scrap", float(s), "MT", q(mon, s), period_start=ps, period_end=pe)]
-    save("07_production_register_q1.jpg", data, "image/jpeg", "Handwritten production register, Hindi/English (photo)", {
+    save("07_production_register_apr-jun.jpg", data, "image/jpeg", "Handwritten production register, Hindi/English (photo)", {
         "doc_type": "production_register", "issuer": "Verkam Fasteners - Plant 1", "recipient": None, "document_number": None,
         "document_date": "2026-06-30", "period_start": "2026-04-01", "period_end": "2026-06-30", "languages": ["Hindi", "English"],
         "line_items": li, "reading_notes": ["May bolts value overwritten: 61.5 crossed out and corrected to 62.5 in red ink.",

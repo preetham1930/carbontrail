@@ -20,7 +20,7 @@ For a fastener maker in Ludhiana, Rajkot or Bekasi, that data lives on paper: ph
 2. **Checks it like a verifier.** A scope & quality agent checks CBAM scope, period coverage, wire-rod balance and yield, fuel attribution, non-EU shipments and hard-to-read numbers.
 3. **Calculates exactly.** A deterministic engine applies the EU method. **The language models never do arithmetic.** Every figure shows its formula, its working and links to its source evidence (`E12` → photo of the register, page 1, "May-26 62.5").
 4. **Explains the money.** Your SEE vs the EU default with mark-up, gross certificate exposure in euros at the quarterly CBAM price, and ranked levers tested with what-if simulations (supplier, fuel, yield, year).
-5. **Acts on the biggest gap.** About 87% of a fastener's footprint is the purchased wire rod. The supplier data agent drafts the request to the mill; when the mill's verified declaration comes back, CarbonTrail reads it and recalculates (demo: 5.36 → 3.25 tCO2e/t).
+5. **Acts on the biggest gap.** About 87% of a fastener's footprint is the purchased wire rod. The supplier data agent drafts the request to the mill; when the mill's verified declaration comes back, CarbonTrail reads it and recalculates (demo: 5.36 → 3.25 tCO2e/t; on one quarter's 160 t of EU shipments, the gross CBAM cost falls from €73,865 on EU default values to €39,162, a saving of €34,703).
 6. **Hands over the evidence.** An Excel data pack mirroring the sections of the Commission's Communication Template, and a PDF evidence pack with every step, quote and finding, ready for the verifier.
 
 ## Architecture
@@ -87,7 +87,9 @@ The script enables the APIs, creates a least-privilege service account (Vertex A
 ## Scope and honest limits
 
 - Beachhead: downstream iron & steel goods (screws, bolts, nuts) made from purchased wire rod: one production process, one aggregated goods category. The scope module covers all CBAM sectors at heading level.
-- Gross certificate exposure is shown before the free-allocation adjustment (CBAM factor 97.5% × benchmark in 2026). Because that adjustment is benchmark-based, it does not change the gap between actual data and default values.
+- Euro figures use the certificate price of the quarter the goods are imported in (the demo's April–June shipments: Q2 2026, €75.28/t). Gross cost is shown first; the estimated payable amount after the free-allocation adjustment (97.5% × the default benchmark of 1.364 tCO2e/t for fasteners) is shown next to it. With verified actual data the producer calculates its own adjustment, so that figure is an estimate. The adjustment applies to both cases, so it does not change the saving.
+- Every agent call fails over to a backup Gemini model if the primary is overloaded (429) or slow; the regulation chat falls back to quoting the matching curated notes, and the supplier email to a template, so a demo never hangs.
+- Uploaded documents are deleted from Cloud Storage by a one-day lifecycle rule; Firestore keeps only summary figures and file names.
 - CarbonTrail prepares verification-ready data. It does not replace the accredited verifier or the EU declarant.
 
 ## Roadmap

@@ -14,6 +14,12 @@ os.environ.setdefault("GOOGLE_CLOUD_LOCATION", LOCATION)
 # Fast multimodal model for document reading; reasoning model for the analyst agents.
 MODEL_INTAKE = os.getenv("CT_MODEL_INTAKE", "gemini-3.8-flash")
 MODEL_REASON = os.getenv("CT_MODEL_REASON", "gemini-3.8-flash")
+# If the primary model is overloaded (429 RESOURCE_EXHAUSTED) or slow, each agent call is retried on these, in order.
+MODEL_FALLBACKS = [m.strip() for m in os.getenv("CT_MODEL_FALLBACKS", "gemini-3.5-flash,gemini-3.8-flash").split(",") if m.strip()]
+# Per-attempt time limits (seconds) so an overloaded model fails fast and the next one is tried.
+TIMEOUT_INTAKE = float(os.getenv("CT_TIMEOUT_INTAKE", "75"))
+TIMEOUT_AGENTS = float(os.getenv("CT_TIMEOUT_AGENTS", "150"))
+TIMEOUT_CHAT = float(os.getenv("CT_TIMEOUT_CHAT", "20"))
 # Gemini 3 thinking level for the agents (MINIMAL, LOW, MEDIUM, HIGH). Empty = model default + temperature.
 THINKING_LEVEL = os.getenv("CT_THINKING_LEVEL", "LOW")
 # Intake thinking level; LOW reads the demo register correctly in about a third of the time. Empty = model default.

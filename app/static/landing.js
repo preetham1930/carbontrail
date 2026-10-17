@@ -50,8 +50,9 @@ const io = new IntersectionObserver((entries) => entries.forEach((e) => {
 }), { rootMargin: "0px 0px -10% 0px" });
 $$(".reveal").forEach((el) => io.observe(el));
 
-/* proof counter: 5.36 → 3.25 */
+/* proof counter: 6.13 (EU default) → 3.25 (own data + the mill's figure) */
 const proofEl = $("#proof-count");
+if (!reduceMotion) proofEl.textContent = "6.13";
 new IntersectionObserver((entries, obs) => entries.forEach((e) => {
   if (!e.isIntersecting) return;
   obs.disconnect();
@@ -59,7 +60,7 @@ new IntersectionObserver((entries, obs) => entries.forEach((e) => {
   const t0 = performance.now() + 500;
   const step = (now) => {
     const k = clamp((now - t0) / 1800);
-    proofEl.textContent = mix(5.36, 3.25, 1 - Math.pow(1 - k, 3)).toFixed(2);
+    proofEl.textContent = mix(6.13, 3.25, 1 - Math.pow(1 - k, 3)).toFixed(2);
     if (k < 1) requestAnimationFrame(step);
   };
   requestAnimationFrame(step);

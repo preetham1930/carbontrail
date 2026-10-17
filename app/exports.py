@@ -55,6 +55,11 @@ def data_pack_xlsx(run) -> bytes:
         ("Precursor embedded emissions (tCO2e)", round(r["precursor_emissions_t"], 3)),
         ("Specific embedded emissions SEE (tCO2e/t)", round(r["see"], 4)),
         ("Certificate price used (EUR/t)", f"{r['price']['eur_per_t']} ({r['price']['quarter']})"),
+        ("Gross CBAM cost, actual data (EUR)", round(r["totals"]["gross_cost_actual_eur"], 2)),
+        ("Gross CBAM cost, EU default values (EUR)", round(r["totals"]["gross_cost_default_eur"] or 0, 2)),
+        ("Estimated payable after free allocation, actual / default (EUR)",
+         "n/a" if r["totals"].get("net_cost_actual_eur") is None else
+         f"{r['totals']['net_cost_actual_eur']:,.2f} / {r['totals']['net_cost_default_eur']:,.2f}"),
         ("", ""), ("Note", DISCLAIMER),
     ]
     for a, b in rows:

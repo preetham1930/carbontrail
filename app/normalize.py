@@ -207,7 +207,7 @@ def normalise(docs: list[tuple[dict, DocumentExtraction]], profile: dict) -> Nor
             notes.append({"doc": "-", "note": f"{cn} is not a CBAM good; excluded."})
             continue
         exp = exports_eu.get(cn, {"t": 0.0, "ev": []})
-        goods.append(GoodInput(cn=cn, description=p["desc"], production_t=round(p["t"], 6), export_eu_t=round(exp["t"], 6), evidence=p["ev"] + exp["ev"]))
+        goods.append(GoodInput(cn=cn, description=_clean_desc(p["desc"]), production_t=round(p["t"], 6), export_eu_t=round(exp["t"], 6), evidence=p["ev"] + exp["ev"]))
     for cn in exports_eu:
         if cn not in production:
             notes.append({"doc": "-", "note": f"EU exports of {cn} found but no production of {cn} in the period."})
@@ -221,7 +221,7 @@ def normalise(docs: list[tuple[dict, DocumentExtraction]], profile: dict) -> Nor
             t, desc, ev = purchases[cn]["t"], purchases[cn]["desc"], purchases[cn]["ev"]
             notes.append({"doc": "-", "note": f"No consumption figure for precursor {cn}; using purchases ({t:.3f} t) as a proxy. Stock changes are ignored."})
         supplier = purchases.get(cn, {}).get("supplier", "")
-        p = PrecursorInput(id=f"P{cn}", cn=cn, description=desc or "Wire rod", consumed_t=round(t, 6), supplier=supplier, evidence=ev)
+        p = PrecursorInput(id=f"P{cn}", cn=cn, description=_clean_desc(desc or "") or "Wire rod", consumed_t=round(t, 6), supplier=supplier, evidence=ev)
         for it, eid in _direct_first(supplier_see, notes, evidence):
             cn_ok = normalise_cn(it.cn_code or cn)[:4] == cn
             if cn_ok and it.quantity is not None and p.see_actual is None:
@@ -248,6 +248,21 @@ def normalise(docs: list[tuple[dict, DocumentExtraction]], profile: dict) -> Nor
     out.notes = notes
     out.exports_non_eu = exports_non_eu
     return out
+
+
+_MONTHS = r"(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*"
+_PERIOD_RE = re.compile(rf"\s*[\(\[]?\s*\b{_MONTHS}\b[\s\-'/,.]*\d{{0,4}}\s*[\)\]]?", re.I)
+_CN_RE = re.compile(r"\s*\(?\b(?:CN|HS)?\s*\d{4}\s?\d{2}(?:\s?\d{2})?\b\)?", re.I)
+
+
+def _clean_desc(text: str) -> str:
+    """A product label for the whole period: drop the month a register row was dated with and the CN code
+    (shown separately), e.g. 'Bolts 7318 15 (Apr-26)' -> 'Bolts'."""
+    t = _PERIOD_RE.sub(" ", text or "")
+    t = _CN_RE.sub(" ", t)
+    t = re.sub(r"\(\s*\)", " ", t)
+    t = re.sub(r"\s{2,}", " ", t).strip(" -,:;")
+    return t or (text or "").strip()
 
 
 def _is_indirect(it: LineItem) -> bool:

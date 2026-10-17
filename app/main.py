@@ -38,7 +38,7 @@ DEMO_PROFILE = {
     "year": 2026,
     "period_start": "2026-04-01",
     "period_end": "2026-06-30",
-    "price_quarter": "2026-Q3",
+    "price_quarter": "2026-Q2",   # April-June shipments enter the EU in Q2: each quarter's price applies to that quarter's imports
     "contact_name": "Operations Head",
 }
 

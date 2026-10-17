@@ -31,7 +31,18 @@
     <button class="nav-l" data-open="ask" type="button">Ask about CBAM</button>
     <a class="nav-l" href="https://github.com/preetham1930/carbontrail" id="repo-link" target="_blank" rel="noopener">GitHub</a>
     <button class="pill-btn only-landing" data-run-demo type="button">Run the demo</button>
+    <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Menu"><span></span><span></span></button>
   </nav>
+  <div class="menu-sheet" id="menu" hidden>
+    <a class="only-landing" href="#journey">The journey</a>
+    <a class="only-landing" href="#explode">How it works</a>
+    <a class="only-landing" href="#paper">Documents</a>
+    <a class="only-landing" href="#agents">Agents</a>
+    <a class="only-landing" href="#stack">Google Cloud</a>
+    <button type="button" data-open="ask">Ask about CBAM</button>
+    <a href="https://github.com/preetham1930/carbontrail" target="_blank" rel="noopener">Source code on GitHub</a>
+    <a href="#team" class="only-landing">Team &amp; contact</a>
+  </div>
 </header>
 
 <main id="main">
@@ -47,31 +58,31 @@
         <p class="hero-sub">EU carbon border data for steel exporters,<br class="br-d"> built from the paperwork they already have.</p>
         <div class="hero-ctas">
           <button class="pill-btn big" id="run-demo" data-run-demo type="button">Run the demo factory</button>
-          <label class="text-link" for="file-input">Upload your documents <span aria-hidden="true">›</span></label>
+          <button type="button" class="text-link" data-pick="file-input">Upload your documents <span aria-hidden="true">›</span></button>
           <input type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.webp" hidden>
         </div>
-        <p class="hero-note">Powered by Gemini 3.8 Flash and Google ADK on Cloud Run.</p>
+        <p class="hero-note">Powered by Gemini 3.8 Flash and Google ADK on Cloud Run. Uploads are deleted automatically within two days.</p>
       </section>
 
       <section class="journey" id="journey" aria-label="The journey of one container of bolts to Europe">
         <div class="journey-pin">
           <canvas id="journey-canvas" aria-hidden="true"></canvas>
           <div class="j-labels" id="j-labels" aria-hidden="true">
-            <span class="j-tag" data-anchor="factory">Verkam Fasteners · Ludhiana</span>
-            <span class="j-tag carbon" data-anchor="container"><b>5.36</b> tCO2e per tonne, inside</span>
+            <span class="j-tag" data-anchor="factory">Verkam Fasteners · Ludhiana · demo</span>
+            <span class="j-tag carbon" data-anchor="container">Carbon inside: <b>not yet documented</b></span>
             <span class="j-tag" data-anchor="sea">To Europe</span>
-            <span class="j-bill" data-anchor="gate"><small>EU border · CBAM</small><b id="j-bill-eur">€80,772</b><em id="j-bill-note">EU default + 10% mark-up</em></span>
+            <span class="j-bill" data-anchor="gate"><small>EU border · CBAM</small><b id="j-bill-eur">€73,865</b><em id="j-bill-note">Gross · EU default + 10% mark-up</em></span>
             <span class="j-tag" data-anchor="warehouse">Buyer · Germany</span>
           </div>
           <div class="j-copy" id="j-copy">
-            <article class="j-step" data-step="0"><p class="j-k">01 · The factory</p><h2>Made in Ludhiana.</h2><p>Every tonne of bolts leaves the factory carrying the carbon it took to make it.</p></article>
+            <article class="j-step" data-step="0"><p class="j-k">01 · The factory · demo data</p><h2>Made in Ludhiana.</h2><p>Every tonne of bolts leaves the factory carrying the carbon it took to make it.</p></article>
             <article class="j-step" data-step="1"><p class="j-k">02 · The paperwork</p><h2>The proof is on paper.</h2><p>Fuel invoices, the steel mill’s statement, a handwritten register. The only record of that carbon.</p></article>
             <article class="j-step" data-step="2"><p class="j-k">03 · The crossing</p><h2>Then, the long way to Europe.</h2><p>The carbon crosses the sea with the goods. Since 2026, Europe counts it.</p></article>
-            <article class="j-step" data-step="3"><p class="j-k">04 · The EU border</p><h2>Here, carbon has a price.</h2><p>Without verified data, the buyer pays on the EU default plus a mark-up: <b class="amber">€80,772</b> this quarter.</p></article>
-            <article class="j-step" data-step="4"><p class="j-k">05 · With CarbonTrail</p><h2>The proof travels with it.</h2><p>Verified figures, every one traced to its page. The same shipments: <b class="green">€42,824</b>.</p></article>
-            <article class="j-step" data-step="5"><p class="j-k">06 · Delivered</p><h2>Delivered. <span class="green">€37,948</span> saved.</h2><p>One quarter, one fastener exporter. Now take CarbonTrail apart.</p></article>
+            <article class="j-step" data-step="3"><p class="j-k">04 · The EU border</p><h2>Here, carbon has a price.</h2><p>With no data of its own, the buyer pays on the EU default value plus a 10% mark-up: <b class="amber">€73,865</b> gross this quarter.</p></article>
+            <article class="j-step" data-step="4"><p class="j-k">05 · With CarbonTrail</p><h2>The proof travels with it.</h2><p>Actual figures, each traced to its page and ready for the verifier. The same shipments: <b class="green">€39,162</b>.</p></article>
+            <article class="j-step" data-step="5"><p class="j-k">06 · Delivered</p><h2>Delivered. <span class="green">€34,703</span> saved.</h2><p>One quarter, one fastener exporter. The saving holds after the free-allocation adjustment. Now take CarbonTrail apart.</p></article>
           </div>
-          <ol class="j-progress" id="j-progress" aria-hidden="true"><li>Factory</li><li>Paperwork</li><li>Sea</li><li>EU border</li><li>Verified</li><li>Delivered</li></ol>
+          <ol class="j-progress" id="j-progress" aria-hidden="true"><li>Factory</li><li>Paperwork</li><li>Sea</li><li>EU border</li><li>Proof</li><li>Delivered</li></ol>
         </div>
       </section>
 
@@ -89,7 +100,7 @@
             <li class="co" data-part="3" data-side="r"><span class="co-n">04 · Trace</span><span class="co-t">Every figure threads back.</span><span class="co-b">Tap any number and the source document opens at the exact words Gemini read.</span><i class="co-line"></i></li>
             <li class="co" data-part="4" data-side="l"><span class="co-n">05 · Prove</span><span class="co-t">Ready for the verifier.</span><span class="co-b">An Excel data pack shaped like the EU template, and a PDF evidence pack.</span><i class="co-line"></i></li>
           </ol>
-          <p class="ex-final" id="ex-final">Reassembled. Verified.</p>
+          <p class="ex-final" id="ex-final">Reassembled. Ready to verify.</p>
         </div>
       </section>
     </div>
@@ -99,10 +110,10 @@
       <section class="sec light" id="why">
         <div class="wrap">
           <p class="sec-eyebrow reveal">Why now</p>
-          <h2 class="sec-title reveal">Carbon now has a price<br class="br-d"> at the EU border.</h2>
+          <h2 class="sec-title reveal">Carbon now has a price<br class="br-d"> at the EU border.<sup class="fn"><a href="#fn3">3</a></sup></h2>
           <div class="bento">
             <article class="tile t-wide reveal"><p class="t-k">Since 1 January 2026</p><p class="t-big">CBAM is live.</p><p class="t-b">EU importers of steel, aluminium, cement and fertiliser now pay for the carbon embedded in what they buy.</p></article>
-            <article class="tile t-dark reveal"><p class="t-k">CBAM certificate, 2026-Q3</p><p class="t-big g-ember">€82.32</p><p class="t-b">per tonne of CO2e.</p></article>
+            <article class="tile t-dark reveal"><p class="t-k">CBAM certificate, Q2 2026</p><p class="t-big g-ember">€75.28</p><p class="t-b">per tonne of CO2e, for goods imported that quarter. Q3: €82.32.</p></article>
             <article class="tile reveal"><p class="t-k">No data, a penalty</p><p class="t-big t-nowrap">+10%<span class="t-arrow">→</span>30%</p><p class="t-b">mark-up on EU default values, 2026 to 2028.</p></article>
             <article class="tile t-wide t-proof reveal"><p class="t-k">The way out</p><p class="t-big">Verified, own data.</p><p class="t-b">The exporter’s figure counts only if it follows the EU method and an accredited verifier can check it. CarbonTrail builds exactly that.</p></article>
           </div>
@@ -115,10 +126,10 @@
           <h2 class="sec-title reveal">The data was always there.<br class="br-d"> On paper.</h2>
         </div>
         <div class="gallery" id="gallery" tabindex="0" aria-label="Documents CarbonTrail reads">
-          <figure class="g-card"><img src="/samples/07_production_register_q1.jpg" alt="Handwritten production register in Hindi and English" loading="lazy"><figcaption><b>A register written by hand.</b> Hindi and English, with a crossed-out 61.5 corrected to 62.5. Caught, and flagged for a human.</figcaption></figure>
+          <figure class="g-card"><img src="/samples/07_production_register_apr-jun.jpg" alt="Handwritten production register in Hindi and English" loading="lazy"><figcaption><b>A register written by hand.</b> Hindi and English, with a crossed-out 61.5 corrected to 62.5. Caught, and flagged for a human.</figcaption></figure>
           <figure class="g-card"><img src="/samples/02_lpg_invoice_apr.jpg" alt="Photographed LPG invoice" loading="lazy"><figcaption><b>An LPG invoice, photographed.</b> 19,800 kg for the hardening furnace: a direct emission.</figcaption></figure>
           <figure class="g-card"><img src="/samples/05_diesel_dg_statement.jpg" alt="Diesel statement for the generator" loading="lazy"><figcaption><b>Diesel for the generator.</b> Excluded automatically. For steel, electricity emissions don’t count.</figcaption></figure>
-          <figure class="g-card"><img src="/img/wire_rod_statement.jpg" alt="Steel mill statement of supplies" loading="lazy"><figcaption><b>The mill’s statement.</b> 270 t of wire rod: 87% of the footprint.</figcaption></figure>
+          <figure class="g-card"><img src="/img/wire_rod_statement.jpg" alt="Steel mill statement of supplies" loading="lazy"><figcaption><b>The mill’s statement.</b> 270 t of wire rod: 87% of the footprint while it sits on the EU default.</figcaption></figure>
           <figure class="g-card"><img src="/samples/09_export_invoice_pl.jpg" alt="Export invoice to Poland" loading="lazy"><figcaption><b>Exports, sorted by border.</b> Germany and Poland count. The UK shipment is set aside.</figcaption></figure>
           <figure class="g-card"><img src="/img/supplier_declaration.jpg" alt="Supplier emissions declaration" loading="lazy"><figcaption><b>The mill writes back.</b> A verified 2.36 replaces the 4.32 default, and the figure is recalculated.</figcaption></figure>
         </div>
@@ -130,15 +141,17 @@
 
       <section class="sec dark proof" id="proof">
         <div class="wrap center">
-          <p class="sec-eyebrow reveal">Proof out</p>
-          <p class="proof-big reveal"><span id="proof-count">5.36</span></p>
-          <p class="proof-unit reveal">tCO2e per tonne of fasteners, once the mill’s verified figure arrives.</p>
-          <div class="proof-row">
-            <div class="reveal"><b>€70,576</b><span>buyers’ exposure with the factory’s own data</span></div>
-            <div class="reveal"><b class="g-amber">€80,772</b><span>on EU default values</span></div>
-            <div class="reveal"><b class="g-proof">€37,948</b><span>less in one quarter, with the mill’s figure</span></div>
+          <p class="sec-eyebrow reveal">Proof out · demo factory</p>
+          <p class="proof-big reveal"><span id="proof-count">3.25</span></p>
+          <p class="proof-unit reveal">tCO2e per tonne of fasteners, from the factory’s own data and the mill’s verified figure.</p>
+          <div class="ladder reveal" role="table" aria-label="CBAM cost of one quarter of EU shipments in three steps">
+            <div class="ld-head" role="row"><span role="columnheader">Data used</span><span role="columnheader">tCO2e/t</span><span role="columnheader">Gross cost</span><span role="columnheader">Payable, est.<sup class="fn"><a href="#fn2">2</a></sup></span></div>
+            <div class="ld-row amber" role="row" style="--w:1"><span role="cell"><b>EU default values</b><em>plus the 10% mark-up</em></span><span role="cell" class="ld-see">6.13</span><span role="cell">€73,865</span><span role="cell">€57,846</span><i class="ld-bar" aria-hidden="true"></i></div>
+            <div class="ld-row steel" role="row" style="--w:.874"><span role="cell"><b>The factory’s own data</b><em>wire rod still on the EU default</em></span><span role="cell" class="ld-see">5.36</span><span role="cell">€64,540</span><span role="cell">€48,522</span><i class="ld-bar" aria-hidden="true"></i></div>
+            <div class="ld-row green" role="row" style="--w:.53"><span role="cell"><b>+ the mill’s verified figure</b><em>2.36 replaces the 4.32 default</em></span><span role="cell" class="ld-see">3.25</span><span role="cell">€39,162</span><span role="cell">€23,144</span><i class="ld-bar" aria-hidden="true"></i></div>
           </div>
-          <p class="foot-ref reveal">Fictional demo factory, Ludhiana, April–June 2026. 160 t shipped to the EU at the 2026-Q3 price.<sup>1</sup></p>
+          <p class="ld-save reveal"><b class="g-proof">€34,703</b> less for the buyers in one quarter. The same before and after the free-allocation adjustment.</p>
+          <p class="foot-ref reveal">Fictional demo factory, Ludhiana: 160 t of bolts and nuts imported into the EU in April–June 2026, at the Q2 2026 certificate price of €75.28.<sup class="fn"><a href="#fn1">1</a></sup></p>
         </div>
       </section>
 
@@ -203,7 +216,7 @@
           <p class="sec-body reveal">Ten realistic documents from a fastener exporter in Ludhiana. Watch the agents work, open the evidence, then send the mill’s reply.</p>
           <div class="hero-ctas reveal">
             <button class="pill-btn big" data-run-demo type="button">Run the demo factory</button>
-            <label class="text-link" for="file-input">Upload your documents <span aria-hidden="true">›</span></label>
+            <button type="button" class="text-link" data-pick="file-input">Upload your documents <span aria-hidden="true">›</span></button>
           </div>
         </div>
       </section>
@@ -211,13 +224,15 @@
       <footer class="foot">
         <div class="wrap">
           <ol class="foot-notes">
-            <li>The demo factory, Verkam Fasteners Pvt. Ltd., and all its documents are fictional. Gross exposure is shown before the free-allocation adjustment.</li>
-            <li>Sources: Regulation (EU) 2023/956; Implementing Regulations (EU) 2025/2547 and 2025/2621; quarterly CBAM certificate prices; IPCC 2006 Guidelines. CarbonTrail prepares verification-ready data; it does not replace the accredited verifier or the EU declarant.</li>
+            <li id="fn1">The demo factory, Verkam Fasteners Pvt. Ltd., and all its documents are fictional. Each quarterly CBAM certificate price applies to goods imported into the EU in that quarter; certificates for 2026 imports are bought from February 2027.</li>
+            <li id="fn2">Gross cost = tonnes exported × embedded emissions × certificate price. Payable is an estimate after the free-allocation adjustment: 97.5% (the 2026 CBAM factor) × the default benchmark of 1.364 tCO2e/t for fasteners (IR (EU) 2025/2620). With verified actual data the producer calculates its own adjustment, so the real figure can differ slightly. The adjustment applies in both cases, so the saving does not change.</li>
+            <li id="fn3">Sources: Regulation (EU) 2023/956 as amended by 2025/2083; Implementing Regulations (EU) 2025/2547, 2025/2620, 2025/2621 and 2026/1740; European Commission quarterly CBAM certificate prices; IPCC 2006 Guidelines. CarbonTrail prepares verification-ready data; it does not replace the accredited verifier or the EU declarant.</li>
+            <li id="privacy"><b>Your documents.</b> Uploads are used only to run your analysis. They are stored in a private Cloud Storage bucket and deleted automatically within two days (a one-day storage lifecycle rule); only the summary figures and file names are kept. This is a hackathon demo, so please don’t upload documents you are not allowed to share.</li>
           </ol>
           <div class="foot-cols">
             <div><p>Product</p><a href="#journey">The journey</a><a href="#explode">How it works</a><a href="#paper">Documents</a><button type="button" class="foot-btn" data-run-demo>Run the demo</button></div>
             <div><p>Technology</p><a href="#agents">Agents</a><a href="#stack">Google Cloud</a><a href="https://github.com/preetham1930/carbontrail" target="_blank" rel="noopener">Source code</a></div>
-            <div><p>Team Verdant</p><span>Preetham Kukkadapu</span><span>Harshitha Neelam</span><span>Google Cloud AI Builder Cup 2026</span></div>
+            <div id="team"><p>Team Verdant</p><span>Preetham Kukkadapu</span><span>Harshitha Neelam</span><span>Google Cloud AI Builder Cup 2026</span><a href="https://github.com/preetham1930/carbontrail/issues" target="_blank" rel="noopener">Contact us on GitHub</a></div>
           </div>
           <p class="foot-copy">CarbonTrail · Manufacturing track · Built with Gemini, Google ADK and Cloud Run.</p>
         </div>
@@ -233,7 +248,7 @@
         <span id="company" class="muted"></span>
       </div>
       <ul id="doc-list" class="doc-list"></ul>
-      <label class="btn small ghost add-doc" for="add-input">Add documents</label>
+      <button type="button" class="btn small ghost add-doc" data-pick="add-input">Add documents</button>
       <input type="file" id="add-input" multiple accept=".pdf,.jpg,.jpeg,.png,.webp" hidden>
     </aside>
 
@@ -261,6 +276,7 @@
                 <div><span class="m-label">On EU default values</span><span class="m-val gold" id="cost-default">–</span></div>
               </div>
               <p class="saving" id="saving"></p>
+              <p class="net-line" id="net-line"></p>
             </div>
           </div>
           <div class="ruler" id="ruler" aria-label="SEE compared with EU default values"></div>

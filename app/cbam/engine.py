@@ -100,7 +100,7 @@ class CalcInput:
     electricity_mwh: float = 0.0
     electricity_evidence: list[str] = field(default_factory=list)
     use_supplier_data: bool = True
-    price_quarter: str | None = None         # e.g. "2026-Q3"; None = latest published
+    price_quarter: str | None = None         # e.g. "2026-Q2"; None = the quarter of period_end (2026 imports pay that quarter's price)
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -198,12 +198,33 @@ def markup_for_year(year: int, ref: dict = REF) -> float:
     return m["2028"]
 
 
-def certificate_price(quarter: str | None, ref: dict = REF) -> tuple[float, str]:
+def quarter_of(date: str) -> str | None:
+    """'2026-06-30' -> '2026-Q2'."""
+    try:
+        y, m = int(date[:4]), int(date[5:7])
+    except (TypeError, ValueError):
+        return None
+    return f"{y}-Q{(m - 1) // 3 + 1}"
+
+
+def certificate_price(quarter: str | None, ref: dict = REF, period_end: str | None = None) -> tuple[float, str]:
+    """2026 imports pay the price of the quarter they are imported in (Art. 21(1a)).
+    Without an explicit quarter, use the quarter the reporting period ends in; if that
+    price is not published yet, fall back to the latest published one."""
     prices = ref["certificate_price_eur"]
-    q = quarter or prices["latest"]
+    q = quarter or quarter_of(period_end or "") or prices["latest"]
     if q not in prices:
         q = prices["latest"]
     return float(prices[q]), q
+
+
+def free_allocation_benchmark(cn: str, ref: dict = REF) -> float | None:
+    fab = ref.get("free_allocation_benchmark", {})
+    c = normalise_cn(cn).replace(" ", "")
+    for k, v in fab.items():
+        if not k.startswith("_") and c.startswith(k):
+            return float(v)
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -322,9 +343,12 @@ def calculate(inp: CalcInput, ref: dict = REF) -> dict[str, Any]:
 
     # 5. Compare with defaults and price exposure
     markup = markup_for_year(inp.year, ref)
-    price, quarter = certificate_price(inp.price_quarter, ref)
+    price, quarter = certificate_price(inp.price_quarter, ref, inp.period_end)
+    cbam_factor = float(ref.get("cbam_factor", {}).get(str(inp.year), ref.get("cbam_factor", {}).get("2026", 0.975)))
     good_rows = []
     tot_exp = tot_actual_cost = tot_default_cost = 0.0
+    tot_fa = tot_net_actual = tot_net_default = 0.0
+    fa_complete = True
     for g in goods:
         base = product_default(g.cn, inp.country, ref)
         marked = base * (1 + markup) if base is not None else None
@@ -332,6 +356,17 @@ def calculate(inp: CalcInput, ref: dict = REF) -> dict[str, Any]:
         cost_actual = emb_actual * price
         cost_default = g.export_eu_t * marked * price if marked is not None else None
         saving = (cost_default - cost_actual) if cost_default is not None else None
+        # Free-allocation adjustment (estimate): certificates are reduced by CBAM factor x benchmark per tonne.
+        bm = free_allocation_benchmark(g.cn, ref)
+        fa_t = g.export_eu_t * cbam_factor * bm if bm is not None else None
+        net_actual = max(0.0, emb_actual - fa_t) * price if fa_t is not None else None
+        net_default = max(0.0, g.export_eu_t * marked - fa_t) * price if (fa_t is not None and marked is not None) else None
+        if fa_t is None or net_default is None:
+            fa_complete = False
+        else:
+            tot_fa += fa_t
+            tot_net_actual += net_actual
+            tot_net_default += net_default
         tot_exp += g.export_eu_t
         tot_actual_cost += cost_actual
         if cost_default is not None:
@@ -343,7 +378,8 @@ def calculate(inp: CalcInput, ref: dict = REF) -> dict[str, Any]:
             "export_eu_t": g.export_eu_t, "see": see, "default_base": base, "markup": markup,
             "default_marked": marked, "embedded_in_exports_t": emb_actual,
             "gross_cost_actual_eur": cost_actual, "gross_cost_default_eur": cost_default,
-            "saving_eur": saving, "evidence": g.evidence,
+            "saving_eur": saving, "free_allocation_benchmark": bm, "free_allocation_t": fa_t,
+            "net_cost_actual_eur": net_actual, "net_cost_default_eur": net_default, "evidence": g.evidence,
             "aggregated_category": scopes[g.cn].aggregated_category,
         })
         if g.export_eu_t > g.production_t + 1e-9:
@@ -353,8 +389,17 @@ def calculate(inp: CalcInput, ref: dict = REF) -> dict[str, Any]:
         "formula": "Exposure = tonnes exported x SEE x certificate price",
         "working": f"{tot_exp:,.3f} t exported; certificate price EUR {price:.2f}/tCO2e ({quarter}); defaults carry a {markup:.0%} mark-up in {inp.year}",
         "result": tot_actual_cost, "unit": "EUR", "evidence": [],
-        "rule": "Art. 21(1a) Reg. 2023/956 quarterly price for 2026; IR (EU) 2025/2621 mark-up",
+        "rule": "Art. 21(1a) Reg. 2023/956 quarterly price for 2026 (the price of the quarter of import); IR (EU) 2025/2621 mark-up",
     })
+    if fa_complete and tot_exp:
+        steps.append({
+            "id": "free_allocation", "title": "Free-allocation adjustment (estimate)",
+            "formula": "Certificates to surrender = embedded emissions - (CBAM factor x benchmark x tonnes)",
+            "working": (f"{cbam_factor:.1%} x default benchmark {tot_fa / cbam_factor / tot_exp:,.3f} tCO2e/t x {tot_exp:,.3f} t = {tot_fa:,.3f} tCO2e deducted; "
+                        f"net EUR {tot_net_actual:,.0f} with your data vs EUR {tot_net_default:,.0f} on defaults"),
+            "result": tot_net_actual, "unit": "EUR", "evidence": [],
+            "rule": "Art. 31 Reg. 2023/956; IR (EU) 2025/2620 benchmarks (column B, applied with default values). With verified actual data the operator computes the adjustment from its own process, so this is an estimate.",
+        })
 
     share_prec = ee_inp / total if total else 0.0
     return {
@@ -378,15 +423,20 @@ def calculate(inp: CalcInput, ref: dict = REF) -> dict[str, Any]:
             "gross_cost_actual_eur": tot_actual_cost,
             "gross_cost_default_eur": tot_default_cost,
             "saving_eur": tot_default_cost - tot_actual_cost if tot_default_cost else None,
+            "free_allocation_t": tot_fa if fa_complete else None,
+            "net_cost_actual_eur": tot_net_actual if fa_complete else None,
+            "net_cost_default_eur": tot_net_default if fa_complete else None,
         },
+        "cbam_factor": cbam_factor,
         "price": {"eur_per_t": price, "quarter": quarter},
         "markup": markup,
         "steps": steps,
         "warnings": warnings,
         "free_allocation_note": (
-            "Certificates actually surrendered are lower after the free-allocation adjustment "
-            f"(CBAM factor {ref['cbam_factor']['2026']:.1%} x product benchmark in 2026). The adjustment is "
-            "benchmark-based, so the gap between actual data and default values shown here is what better data saves."
+            (f"After the free-allocation adjustment (CBAM factor {cbam_factor:.1%} x benchmark) an estimated EUR {tot_net_actual:,.0f} "
+             f"is payable with your data and EUR {tot_net_default:,.0f} on defaults. " if fa_complete else
+             f"Certificates actually surrendered are lower after the free-allocation adjustment (CBAM factor {cbam_factor:.1%} x benchmark). ")
+            + "The adjustment is applied to both, so the gap between actual data and default values is what better data saves."
         ),
     }
 

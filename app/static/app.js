@@ -25,6 +25,17 @@ const S = { runId: null, run: null, es: null, seen: 0, docs: {}, scenTimer: null
 $$("[data-run-demo]").forEach((b) => b.addEventListener("click", () => start({ useSamples: true })));
 $("#file-input").addEventListener("change", (e) => e.target.files.length && start({ files: e.target.files }));
 $("#add-input").addEventListener("change", (e) => e.target.files.length && addDocs({ files: e.target.files }));
+// Phone menu
+{
+  const btn = $("#menu-btn"), sheet = $("#menu");
+  const set = (open) => { sheet.hidden = !open; btn.setAttribute("aria-expanded", String(open)); btn.classList.toggle("open", open); };
+  btn.onclick = () => set(sheet.hidden);
+  sheet.addEventListener("click", (e) => { if (e.target.closest("a, button")) set(false); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") set(false); });
+  addEventListener("resize", () => innerWidth > 880 && set(false));
+}
+// Upload controls are real buttons (keyboard and screen readers) that open the hidden file inputs.
+$$("[data-pick]").forEach((b) => (b.onclick = () => $("#" + b.dataset.pick).click()));
 
 async function start({ useSamples = false, files = null }) {
   const btns = $$("[data-run-demo]");
@@ -61,6 +72,7 @@ async function addDocs({ files = null, sample = "" }) {
   if (!r.ok) { alert((await r.json()).detail || "Upload failed"); return false; }
   const data = await r.json();
   data.documents.forEach(upsertDoc);
+  markBriefsStale();
   $("#live").hidden = false;
   setPhase(0);
   setStatus("Reading the new document and updating the figures", true);
@@ -112,7 +124,11 @@ function traceItem(ev) {
     }
     case "note": li.innerHTML = who("") + `<div class="what">${esc(ev.text)}</div>`; return li;
     case "result": li.innerHTML = who("calculation_agent") + `<div class="what">Exact calculation done: SEE <b>${num(ev.see, 3)} tCO2e/t</b>. The agents now review it.</div>`; return li;
-    case "tool_call": li.innerHTML = who(ev.agent) + `<div class="what">Calls <code>${esc(ev.tool)}</code>${ev.args && Object.keys(ev.args).length ? ` <code>${esc(JSON.stringify(ev.args))}</code>` : ""}</div>`; return li;
+    case "tool_call": {
+      const raw = `${ev.tool}(${ev.args && Object.keys(ev.args).length ? JSON.stringify(ev.args) : ""})`;
+      li.innerHTML = who(ev.agent) + `<div class="what">${toolSentence(ev.tool, ev.args || {})}<details class="raw"><summary>Technical detail</summary><code>${esc(raw)}</code></details></div>`;
+      return li;
+    }
     case "tool_result": li.innerHTML = who(ev.agent) + `<div class="what"><details><summary>Result of ${esc(ev.tool)}</summary><pre>${esc(typeof ev.result === "string" ? ev.result : JSON.stringify(ev.result, null, 1))}</pre></details></div>`; return li;
     case "agent_message": li.innerHTML = who(ev.agent) + `<div class="what msg">${md(ev.text)}</div>`; return li;
     case "warning": li.innerHTML = who("") + `<div class="what"><span class="sev medium">note</span> ${esc(ev.text)}</div>`; return li;
@@ -120,6 +136,28 @@ function traceItem(ev) {
     case "done": li.className = "tr stage"; li.textContent = "Done."; return li;
   }
   return null;
+}
+
+/* Plain-English line for each agent tool call (the raw call stays one click away). */
+function toolSentence(tool, a) {
+  const sev = (x) => `<span class="sev ${esc(x)}">${esc(x)}</span>`;
+  switch (tool) {
+    case "get_activity_data": return "Reads the figures taken from your documents.";
+    case "check_cbam_scope": return `Checks which products CBAM covers${a.cn_codes ? ` (CN ${esc([].concat(a.cn_codes).join(", "))})` : ""}.`;
+    case "run_data_quality_checks": return "Runs the data quality checks a verifier would run.";
+    case "record_finding": return `Records a finding ${sev(a.severity || "medium")} <b>${esc(a.title || "")}</b>`;
+    case "calculate_embedded_emissions": return "Runs the exact EU calculation in code.";
+    case "compare_with_eu_defaults": return "Compares your figure with the EU default values and prices it in euros.";
+    case "simulate_scenario": {
+      const parts = [];
+      if (a.precursor_see != null) parts.push(`wire rod at ${esc(a.precursor_see)} tCO2e/t`);
+      if (a.fuel_switch_to) parts.push(`furnace on ${esc(String(a.fuel_switch_to).replace(/_/g, " "))}`);
+      if (a.yield_gain_pct != null) parts.push(`${esc(a.yield_gain_pct)}% better yield`);
+      if (a.year != null) parts.push(`the year ${esc(a.year)}`);
+      return `Tests a what-if: ${parts.join(", ") || "a change to your inputs"}.`;
+    }
+    default: return `Uses the ${esc(tool.replace(/_/g, " "))} tool.`;
+  }
 }
 
 /* Progress stepper: 0 Read, 1 Calculate, 2 Review, 3 Advise; 4 = all done. */
@@ -188,13 +226,17 @@ function renderHeader(r) {
   $("#see-value").textContent = num(r.see, 2);
   const bases = r.precursors.map((p) => p.basis).join(", ");
   $("#see-basis").innerHTML = `${num(r.activity_level_t, 1)} t of fasteners · wire rod on <b>${esc(bases || "n/a")}</b>`;
-  $("#money-k").textContent = `Gross certificate exposure on ${num(r.totals.export_eu_t, 0)} t shipped to the EU this period (EUR ${r.price.eur_per_t}/t, ${r.price.quarter})`;
+  const [qy, qq] = String(r.price.quarter).split("-");
+  $("#money-k").textContent = `Gross CBAM cost of the ${num(r.totals.export_eu_t, 0)} t shipped to the EU this period, at the ${qq} ${qy} certificate price of EUR ${num(r.price.eur_per_t, 2)}/t`;
   $("#cost-actual").textContent = eur(r.totals.gross_cost_actual_eur);
   $("#cost-default").textContent = eur(r.totals.gross_cost_default_eur);
   const sav = r.totals.saving_eur;
   $("#saving").innerHTML = sav == null ? "" : sav > 0
     ? `Your own data is worth <span class="verdant">${eur(sav)}</span> to your buyers this period.`
     : `Your figure is above the EU default by ${eur(-sav)}: check the findings before sharing it.`;
+  const t = r.totals;
+  $("#net-line").innerHTML = t.net_cost_actual_eur == null ? "" :
+    `After the free-allocation adjustment, buyers pay an estimated <b>${eur(t.net_cost_actual_eur)}</b> with your data and <b>${eur(t.net_cost_default_eur)}</b> on defaults. The saving stays the same.`;
   drawRuler(r, S.scen);
   const pPrec = r.breakdown.precursors * 100, pFuel = r.breakdown.process_fuels * 100;
   $("#split").innerHTML = `<div class="s-prec" style="width:${pPrec}%" title="Purchased wire rod">Wire rod ${pPrec.toFixed(0)}%</div><div class="s-fuel" style="width:${pFuel}%" title="Fuel burned in the furnace">${pFuel < 20 && innerWidth < 620 ? "" : "Furnace fuel "}${pFuel.toFixed(0)}%</div>`;
@@ -241,11 +283,19 @@ function renderSteps(r) {
 function renderFindings(run) {
   const agentF = (run.agent_findings || []).map((f) => ({ ...f, agent: true }));
   const all = [...agentF, ...run.findings.filter((f) => f.severity !== "info" || ["non_eu_export", "dg_excluded"].includes(f.code))];
-  const high = all.filter((f) => f.severity === "high").length;
-  $("#find-count").textContent = high ? String(high) : "";
+  $("#find-count").textContent = all.length ? String(all.length) : "";
+  $("#find-count").title = `${all.length} finding${all.length === 1 ? "" : "s"}, ${all.filter((f) => f.severity === "high").length} high`;
   $("#findings").innerHTML = all.map((f) => `<li class="finding ${f.severity}"><h4><span class="sev ${f.severity}">${f.severity}</span>${f.agent ? '<span class="sev agent">agent review</span>' : ""}${esc(f.title)}</h4>
     <p>${esc(f.detail)}</p>${f.action ? `<p class="act">${esc(f.action)}</p>` : ""}${chips(f.evidence || [])}</li>`).join("");
   bindChips($("#findings"));
+}
+
+/* The agents' written briefs describe one set of figures; while new documents are analysed, hide them
+   so the page never shows a new number next to old advice. */
+function markBriefsStale() {
+  const wait = `<p class="muted updating"><span class="spin" aria-hidden="true"></span> The agents are updating this for the new figures…</p>`;
+  ["#brief-advice", "#brief-calc", "#brief-quality"].forEach((id) => ($(id).innerHTML = wait));
+  $("#agent-scenarios").innerHTML = "";
 }
 
 function renderBriefs(b) {
@@ -264,7 +314,9 @@ function renderAgentScenarios(list) {
 /* ---------- evidence ---------- */
 function chips(ids) {
   if (!ids?.length) return "";
-  return `<div class="ev-chips">${ids.map((id) => `<button class="ev" data-ev="${esc(id)}" title="Show where this number comes from">${esc(id)}</button>`).join("")}</div>`;
+  const ev = S.run?.evidence || {};
+  const tip = (id) => { const e = ev[id]; return e ? `Source ${id}: ${e.doc_name}, page ${e.page}. “${e.quote}”. Click to open it.` : "Show where this number comes from"; };
+  return `<div class="ev-chips">${ids.map((id) => `<button class="ev" data-ev="${esc(id)}" title="${esc(tip(id))}" aria-label="${esc(tip(id))}">${esc(id)}</button>`).join("")}</div>`;
 }
 function bindChips(root) { $$(".ev", root).forEach((b) => (b.onclick = () => openEvidence([b.dataset.ev]))); }
 
@@ -371,11 +423,12 @@ function renderSupplier(run) {
     <div class="step-card">
       <h3>2. Add the supplier's reply</h3>
       <p class="small muted">Upload the declaration the mill sends back. CarbonTrail reads it, checks it is verified, and recalculates.</p>
-      <div class="row-btns"><label class="btn small" for="sup-upload">Upload the reply</label><input type="file" id="sup-upload" accept=".pdf,.jpg,.jpeg,.png" hidden>
+      <div class="row-btns"><button type="button" class="btn small" id="sup-pick">Upload the reply</button><input type="file" id="sup-upload" accept=".pdf,.jpg,.jpeg,.png" hidden>
       <button class="btn small ghost" id="sup-demo">Use the demo mill's reply</button></div>
     </div>`;
   bindChips($("#supplier"));
   $("#sup-draft").onclick = draftSupplier;
+  $("#sup-pick").onclick = () => $("#sup-upload").click();
   if (req) {
     $("#sup-copy").onclick = () => navigator.clipboard.writeText(`${$("#sup-subj").value}\n\n${$("#sup-body").value}`).then(() => ($("#sup-copy").textContent = "Copied"));
     $("#sup-mail").onclick = (e) => { e.preventDefault(); location.href = `mailto:?subject=${encodeURIComponent($("#sup-subj").value)}&body=${encodeURIComponent($("#sup-body").value)}`; };
@@ -387,9 +440,13 @@ function renderSupplier(run) {
 async function draftSupplier() {
   const b = $("#sup-draft");
   b.disabled = true; b.textContent = "Drafting…";
-  const res = await fetch(`/api/runs/${S.runId}/supplier-request`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sender: "Operations Head, Verkam Fasteners" }) });
-  if (!res.ok) { b.disabled = false; b.textContent = "Draft the request"; alert((await res.json()).detail); return; }
-  S.run.supplier_request = await res.json();
+  let data = null;
+  try {
+    const res = await fetch(`/api/runs/${S.runId}/supplier-request`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sender: "Operations Head, Verkam Fasteners" }) });
+    data = res.ok ? await res.json() : null;
+  } catch { data = null; }
+  if (!data) { b.disabled = false; b.textContent = "Draft the request"; setStatus("The supplier data agent could not be reached. Try again in a minute."); return; }
+  S.run.supplier_request = data;
   renderSupplier(S.run);
 }
 
@@ -408,13 +465,27 @@ $("#ask-form").addEventListener("submit", async (e) => {
   a.innerHTML = `<span class="spin" aria-hidden="true"></span> Checking the regulation notes…`;
   log.append(a);
   log.scrollTop = log.scrollHeight;
+  const slow = setTimeout(() => { a.innerHTML = `<span class="spin" aria-hidden="true"></span> Gemini is busy; trying a backup model…`; }, 20000);
+  const ctl = new AbortController();
+  const stop = setTimeout(() => ctl.abort(), 90000);
   try {
-    const r = await fetch("/api/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q, run_id: S.runId }) });
-    const d = await r.json();
-    a.innerHTML = r.ok ? md(d.answer) : esc(d.detail);
-  } catch { a.textContent = "The regulation agent could not be reached. Try again."; }
+    const r = await fetch("/api/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q, run_id: S.runId }), signal: ctl.signal });
+    let d = {};
+    try { d = await r.json(); } catch { /* proxy error page */ }
+    if (r.ok && d.answer) a.innerHTML = md(d.answer);
+    else askFailed(a, q, d.detail || `The regulation agent did not answer (HTTP ${r.status}).`);
+  } catch (err) {
+    askFailed(a, q, err.name === "AbortError" ? "The regulation agent took too long to answer." : "The regulation agent could not be reached.");
+  } finally { clearTimeout(slow); clearTimeout(stop); }
   log.scrollTop = log.scrollHeight;
 });
+
+function askFailed(el, q, why) {
+  el.classList.add("err");
+  el.innerHTML = `<p>${esc(why)}</p><button type="button" class="btn small ghost">Try again</button>`;
+  el.querySelector("button").onclick = () => { el.previousElementSibling?.remove(); el.remove(); $("#ask-input").value = q; $("#ask-form").requestSubmit(); };
+}
+
 
 /* ---------- tiny markdown ---------- */
 function md(src) {
