@@ -193,9 +193,11 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .ruler .mark.edge-l b { transform: translateX(34%); }
 
 .split { display: flex; height: 30px; border-radius: 99px; overflow: hidden; margin-top: 18px; font-size: .76rem; font-weight: 700; }
-.split div { display: flex; align-items: center; padding: 0 12px; white-space: nowrap; overflow: hidden; transition: width .6s var(--ease); }
+.split div { display: flex; align-items: center; padding: 0 8px; white-space: nowrap; overflow: hidden; transition: width .6s var(--ease); }
 .split .s-prec { background: #DCE4E1; color: var(--g0); }
 .split .s-fuel { background: var(--ember); color: #1A0D06; }
+.split-key { margin: 8px 0 0; font-size: .76rem; color: #A1A1A6; }
+.split-key:empty { display: none; }
 
 /* Tabs */
 .tabs { display: flex; gap: 2px; margin: 22px 0 0; padding: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; overflow-x: auto; width: max-content; max-width: 100%; box-shadow: var(--shadow); }

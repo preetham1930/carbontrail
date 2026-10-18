@@ -29,11 +29,13 @@ def run_checks(norm: Normalized, profile: dict) -> list[dict]:
         add("not_a_record", "medium", f"File set aside: {sa['doc']}",
             f"This file does not look like a business record ({sa['reason']}). Nothing from it was used in the calculation.",
             action="Upload the original invoice, bill, statement or register instead.")
-    if norm.out_of_period:
+    # earlier months printed on a bill (an electricity bill's consumption history) are context, not a data problem
+    oop = [e for e in norm.out_of_period if norm.evidence[e].kind != "electricity"]
+    if oop:
         add("out_of_period", "medium", "Figures dated outside the reporting period were left out",
-            f"{len(norm.out_of_period)} quantit{'y' if len(norm.out_of_period) == 1 else 'ies'} fall outside "
+            f"{len(oop)} quantit{'y' if len(oop) == 1 else 'ies'} fall outside "
             f"{profile.get('period_start')} to {profile.get('period_end')} and were not counted.",
-            evidence=list(norm.out_of_period), action="Check the dates, or upload records for the reporting period.")
+            evidence=oop, action="Check the dates, or upload records for the reporting period.")
 
     # Production coverage
     missing_prod = sorted(period - norm.months_with_production)

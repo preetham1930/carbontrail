@@ -48,7 +48,7 @@ Steps:
 2. Call compare_with_eu_defaults.
 3. Write a verifier-style explanation (max 130 words): the specific embedded emissions (SEE) in tCO2e per tonne, what share comes from purchased precursors vs fuels burned on site, which emission sources were excluded and why, and how the result compares with the EU default value including the mark-up.
 
-Quote numbers exactly as the tools return them (rounded sensibly), with units.
+Quote numbers as the tools return them, with units, rounded for people: tCO2e per tonne to two decimals (5.26), tonnes to one decimal, euros as whole amounts (€21,469).
 
 Terminology (CBAM): "default values" are the EU's per-country fallback emission values (with a mark-up when used); "benchmarks" are only used for the free-allocation adjustment. Never call default values "benchmarks". Say "actual data" for the factory's own figures; an accredited verifier, not CarbonTrail, verifies them."""
 
@@ -65,7 +65,7 @@ Steps:
 ### Do this next
 (2-3 concrete actions, first one about the most important data gap.)
 
-Max 220 words. Use only numbers returned by tools. Lead with the saving versus default values, which is the same before and after the free-allocation adjustment. If you quote what the buyer pays, use the estimated net payable figures and call them estimates; gross figures are before the free-allocation adjustment, so say "gross" if you use them.
+Max 220 words. Use only numbers returned by tools, rounded for people: tCO2e per tonne to two decimals (5.26), percentages to whole numbers, euros as whole amounts (€21,469). Lead with the saving versus default values, which is the same before and after the free-allocation adjustment. If you quote what the buyer pays, use the estimated net payable figures and call them estimates; gross figures are before the free-allocation adjustment, so say "gross" if you use them.
 
 Terminology (CBAM): "default values" are the EU's per-country fallback emission values (with a mark-up when used); "benchmarks" are only used for the free-allocation adjustment. Never call default values "benchmarks". Say "actual data" for the factory's own figures; an accredited verifier, not CarbonTrail, verifies them."""
 
@@ -76,7 +76,7 @@ Use the facts given. Ask specifically for:
 - the specific embedded emissions (direct, tCO2e per tonne) for the CN code supplied, for the stated period, calculated per Implementing Regulation (EU) 2025/2547, preferably in the Commission's CBAM Communication Template;
 - the accredited verifier's statement (actual values must be verified from 2026);
 - any carbon price effectively paid.
-Explain in one sentence why it matters to both companies (without data, EU buyers must use penalty-loaded default values, which makes Indian steel less competitive).
+Explain in one sentence why it matters to both companies (without data, EU buyers must use penalty-loaded default values, which makes the exporter's steel less competitive).
 Offer a call. Keep it under 200 words. Output JSON with keys "subject" and "body". Sign off with the sender name given."""
 
 REGULATION = """You are the Regulation Agent of CarbonTrail. You answer questions about the EU Carbon Border Adjustment Mechanism (CBAM) for small manufacturers, especially exporters in the Asia-Pacific region.

@@ -33,6 +33,7 @@ $("#add-input").addEventListener("change", (e) => e.target.files.length && addDo
   sheet.addEventListener("click", (e) => { if (e.target.closest("a, button")) set(false); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") set(false); });
   addEventListener("resize", () => innerWidth > 880 && set(false));
+  let rs; addEventListener("resize", () => { clearTimeout(rs); rs = setTimeout(() => S.run && S.run.result && renderHeader(S.run.result), 200); });
 }
 // Upload controls are real buttons (keyboard and screen readers) that open the hidden file inputs.
 $$("[data-pick]").forEach((b) => (b.onclick = () => $("#" + b.dataset.pick).click()));
@@ -266,7 +267,27 @@ function renderHeader(r) {
     `After the free-allocation adjustment, buyers pay an estimated <b>${eur(t.net_cost_actual_eur)}</b> with your data and <b>${eur(t.net_cost_default_eur)}</b> on defaults. The saving stays the same.`;
   drawRuler(r, S.scen);
   const pPrec = r.breakdown.precursors * 100, pFuel = r.breakdown.process_fuels * 100;
-  $("#split").innerHTML = `<div class="s-prec" style="width:${pPrec}%" title="Purchased wire rod">Wire rod ${pPrec.toFixed(0)}%</div><div class="s-fuel" style="width:${pFuel}%" title="Fuel burned in the furnace">${pFuel < 20 && innerWidth < 620 ? "" : "Furnace fuel "}${pFuel.toFixed(0)}%</div>`;
+  const split = $("#split");
+  split.innerHTML = `<div class="s-prec" style="width:${pPrec}%" title="Purchased wire rod ${pPrec.toFixed(0)}%"></div><div class="s-fuel" style="width:${pFuel}%" title="Fuel burned in the furnace ${pFuel.toFixed(0)}%"></div>`;
+  // each label takes the longest form that fits its segment ("Furnace fuel 8%" → "Fuel 8%" → "8%" → none)
+  const fit = (el, share, forms) => {
+    const room = split.clientWidth * share / 100 - 16;
+    const probe = document.createElement("span");
+    probe.style.cssText = "position:absolute;visibility:hidden;white-space:nowrap";
+    el.appendChild(probe);
+    let pick = "";
+    for (const f of forms) { probe.textContent = f; if (probe.offsetWidth <= room) { pick = f; break; } }
+    probe.remove();
+    el.textContent = pick;
+  };
+  const [segP, segF] = split.children;
+  fit(segP, pPrec, [`Wire rod ${pPrec.toFixed(0)}%`, `${pPrec.toFixed(0)}%`]);
+  const fullF = `Furnace fuel ${pFuel.toFixed(0)}%`, fullP = `Wire rod ${pPrec.toFixed(0)}%`;
+  fit(segF, pFuel, [fullF, `Fuel ${pFuel.toFixed(0)}%`, `${pFuel.toFixed(0)}%`]);
+  // when a segment is too narrow for its full name, spell both out under the bar
+  let key = $("#split-key");
+  if (!key) { key = document.createElement("p"); key.id = "split-key"; key.className = "split-key"; split.after(key); }
+  key.textContent = segF.textContent === fullF && segP.textContent === fullP ? "" : `${fullP} · ${fullF}`;
 }
 
 const SHORT = { "731815": "bolts", "731816": "nuts" };
