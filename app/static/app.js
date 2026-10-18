@@ -89,9 +89,15 @@ function listen() {
     const ev = JSON.parse(m.data);
     S.seen++;
     onEvent(ev);
-    if (ev.type === "done" || ev.type === "error") es.close();
+    if (ev.type === "done" || ev.type === "error") { es.close(); S.es = null; }
   };
-  es.onerror = () => { /* browser retries automatically */ };
+  // A dropped connection (flaky network): reopen from the last event received, so nothing is missed or repeated.
+  es.onerror = () => {
+    if (S.es !== es) return;
+    es.close();
+    clearTimeout(S.retry);
+    S.retry = setTimeout(() => { if (S.es === es) listen(); }, 1500);
+  };
 }
 
 function onEvent(ev) {
@@ -202,9 +208,22 @@ function upsertDoc(d) {
 }
 
 /* ---------- results ---------- */
+async function getRun(tries = 6) {
+  // The run lives on the server; a failed fetch (network blip) is retried rather than leaving the page half drawn.
+  for (let i = 0; i < tries; i++) {
+    try {
+      const r = await fetch(`/api/runs/${S.runId}`, { cache: "no-store" });
+      if (r.ok) return r;
+      if (r.status === 404) return null;
+    } catch (e) { /* offline for a moment */ }
+    await new Promise((res) => setTimeout(res, 1000 * (i + 1)));
+  }
+  return null;
+}
+
 async function refresh(final) {
-  const r = await fetch(`/api/runs/${S.runId}`);
-  if (!r.ok) return;
+  const r = await getRun();
+  if (!r) return;
   S.run = await r.json();
   const run = S.run;
   $("#company").textContent = `${run.profile.company} · ${run.profile.period_start} to ${run.profile.period_end}`;
