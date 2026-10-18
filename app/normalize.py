@@ -148,6 +148,12 @@ def _fuel_use(item: LineItem) -> str:
     return "unknown"
 
 
+def _unit_key(unit) -> str:
+    from .cbam.engine import _u
+    u = _u(unit or "")
+    return {"tonne": "t", "tonnes": "t", "ton": "t", "tons": "t", "mt": "t", "kgs": "kg", "ltr": "l", "litre": "l", "litres": "l", "liter": "l", "liters": "l"}.get(u, u)
+
+
 def _drop_total_rows(items: list[LineItem], kind: str) -> tuple[list[LineItem], list[str]]:
     """If a document lists monthly rows plus a 'Total' row, keep only the rows."""
     rows = [i for i in items if i.kind == kind]
@@ -163,7 +169,7 @@ def _drop_total_rows(items: list[LineItem], kind: str) -> tuple[list[LineItem], 
     for i in rows:
         if i.quantity is not None:
             key = _cn6(i.cn_code, i.description) if kind in ("production", "export", "precursor_consumption", "precursor_purchase") else ""
-            groups[(key, (i.unit or "").strip().lower())].append(i)
+            groups[(key, _unit_key(i.unit))].append(i)
     drop = []
     for g in groups.values():
         if len(g) < 3:
@@ -265,18 +271,21 @@ def normalise(docs: list[tuple[dict, DocumentExtraction]], profile: dict) -> Nor
                         continue
                     if not normalise_cn(it.cn_code or ""):
                         notes.append({"doc": meta["name"], "note": f"'{it.description}' has no CN code on the page; mapped to CN {cn[:4]} {cn[4:]} from its name. Please confirm."})
-                    production[cn]["t"] += to_tonnes(it.quantity, it.unit or "t")
+                    t = to_tonnes(it.quantity, it.unit or "t")
+                    production[cn]["t"] += t
                     production[cn]["desc"] = production[cn]["desc"] or it.description
                     production[cn]["ev"].append(eid)
                     out.months_with_production |= months
                 elif it.kind == "precursor_consumption":
                     cn = normalise_cn(it.cn_code or "7213")[:4]
-                    consumption[cn]["t"] += to_tonnes(it.quantity, it.unit or "t")
+                    t = to_tonnes(it.quantity, it.unit or "t")
+                    consumption[cn]["t"] += t
                     consumption[cn]["desc"] = consumption[cn]["desc"] or it.description
                     consumption[cn]["ev"].append(eid)
                 elif it.kind == "precursor_purchase":
                     cn = normalise_cn(it.cn_code or "7213")[:4]
-                    purchases[cn]["t"] += to_tonnes(it.quantity, it.unit or "t")
+                    t = to_tonnes(it.quantity, it.unit or "t")
+                    purchases[cn]["t"] += t
                     purchases[cn]["desc"] = purchases[cn]["desc"] or it.description
                     purchases[cn]["ev"].append(eid)
                     purchases[cn]["supplier"] = purchases[cn]["supplier"] or (it.party or ex.issuer or "")
@@ -299,6 +308,8 @@ def normalise(docs: list[tuple[dict, DocumentExtraction]], profile: dict) -> Nor
     # Goods
     goods = []
     for cn, p in production.items():
+        if p["t"] <= 0:
+            continue
         if not check_scope(cn).in_scope:
             notes.append({"doc": "-", "note": f"{cn} is not a CBAM good; excluded."})
             continue

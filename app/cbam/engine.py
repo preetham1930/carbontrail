@@ -122,8 +122,23 @@ class CalcError(ValueError):
 # Helpers
 # ---------------------------------------------------------------------------
 
+def _norm_unit(unit: str) -> str:
+    return (unit or "").strip().lower().replace(".", "").replace(" ", "").strip("()[]")
+
+
+# Units as printed on Indian paperwork in Hindi or Gujarati, mapped to the symbols above.
+_UNIT_ALIASES = {_norm_unit(k): v for k, v in {
+    "टन": "t", "टन्स": "t", "मीट्रिक टन": "mt", "मी. टन": "mt", "किलो": "kg", "किग्रा": "kg", "कि.ग्रा.": "kg",
+    "किलोग्राम": "kg", "क्विंटल": "quintal", "लीटर": "l", "लिटर": "l", "ली.": "l", "किलोलीटर": "kl",
+    "यूनिट": "units", "किलोवाट घंटा": "kwh",
+    "ટન": "t", "મેટ્રિક ટન": "mt", "કિલો": "kg", "કિ.ગ્રા.": "kg", "કિલોગ્રામ": "kg", "લીટર": "l", "લિટર": "l",
+    "યુનિટ": "units",
+}.items()}
+
+
 def _u(unit: str) -> str:
-    return (unit or "").strip().lower().replace(".", "").replace(" ", "")
+    u = _norm_unit(unit)
+    return _UNIT_ALIASES.get(u, u)
 
 
 def fuel_energy_gj(f: FuelInput, ref: dict = REF) -> tuple[float, float | None, str]:

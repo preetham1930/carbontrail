@@ -100,8 +100,8 @@ def test_own_uploads_take_period_and_company_from_the_documents():
 
 def test_hindi_register_without_codes_and_8_digit_export_codes_match_up():
     reg = DocumentExtraction(doc_type="production_register", period_start="2026-04-01", period_end="2026-06-30", line_items=[
-        _item(description="बोल्ट (टन) अप्रैल", cn_code=None, quantity=48.6, period_start="2026-04-01", period_end="2026-04-30"),
-        _item(description="बोल्ट (टन) मई", cn_code=None, quantity=50.3, period_start="2026-05-01", period_end="2026-05-31"),
+        _item(description="बोल्ट (टन) अप्रैल", cn_code=None, quantity=48.6, unit="टन", period_start="2026-04-01", period_end="2026-04-30"),
+        _item(description="बोल्ट (टन) मई", cn_code=None, quantity=50.3, unit="टन", period_start="2026-05-01", period_end="2026-05-31"),
         _item(description="बोल्ट (टन) जून", cn_code=None, quantity=46.9, period_start="2026-06-01", period_end="2026-06-30"),
         _item(description="बोल्ट (टन)", cn_code=None, quantity=145.8, period_start="2026-04-01", period_end="2026-06-30"),  # unlabelled total
         _item(description="नट (टन) अप्रैल", cn_code=None, quantity=16.2, period_start="2026-04-01", period_end="2026-04-30")])
