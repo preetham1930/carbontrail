@@ -391,3 +391,7 @@ input[type=range] { accent-color: var(--ember); width: 100%; }
 .ruler .mark.edge-l b { transform: none; }
 
 .privacy-note { margin: 10px 0 0; font-size: .78rem; color: var(--steel); text-align: center; }
+
+.status .stop { margin-top: 6px; padding: 18px 20px; border-radius: 16px; background: #FFF8EC; border: 1px solid #F0D29A; color: #1D1D1F; }
+.status .stop b { display: block; font-size: 1.02rem; margin-bottom: 6px; }
+.status .stop p { margin: 0 0 12px; color: #4A4A4F; line-height: 1.5; }

@@ -55,6 +55,8 @@ class Normalized:
     fuel_months: set[str] = field(default_factory=set)
     low_confidence: list[str] = field(default_factory=list)
     supplier_names: list[str] = field(default_factory=list)
+    set_aside: list[dict] = field(default_factory=list)       # files that are not business records
+    out_of_period: list[str] = field(default_factory=list)    # evidence ids dated outside the reporting period
 
 
 def _month_keys(start: str | None, end: str | None, fallback: str | None) -> set[str]:
@@ -119,6 +121,28 @@ def _drop_total_rows(items: list[LineItem], kind: str) -> tuple[list[LineItem], 
     return items, dropped
 
 
+_PERIOD_KINDS = {"fuel", "electricity", "precursor_purchase", "precursor_consumption", "production", "export", "scrap"}
+
+
+def _date(s: str | None):
+    try:
+        return date.fromisoformat((s or "")[:10])
+    except ValueError:
+        return None
+
+
+def _outside(it: LineItem, ex: DocumentExtraction, p0, p1) -> bool:
+    """True when a quantity is dated wholly outside the reporting period. A dated period must overlap it;
+    a document date alone may fall up to 45 days after the period (bills are issued after the month)."""
+    if not (p0 and p1):
+        return False
+    s, e = _date(it.period_start or ex.period_start), _date(it.period_end or ex.period_end)
+    if s or e:
+        return bool((e and e < p0) or (s and s > p1))
+    d = _date(ex.document_date)
+    return bool(d and (d < p0 or (d - p1).days > 45))
+
+
 def normalise(docs: list[tuple[dict, DocumentExtraction]], profile: dict) -> Normalized:
     country = profile.get("country", "India")
     evidence: dict[str, Evidence] = {}
@@ -135,7 +159,13 @@ def normalise(docs: list[tuple[dict, DocumentExtraction]], profile: dict) -> Nor
     out = Normalized(calc_input=None, evidence=evidence)  # type: ignore[arg-type]
     n = 0
 
+    p0 = _date(profile.get("period_start")); p1 = _date(profile.get("period_end"))
     for meta, ex in docs:
+        if not getattr(ex, "is_source_record", True):
+            reason = (ex.not_a_record_reason or "it does not look like an invoice, bill, statement or register").strip().rstrip(".")
+            out.set_aside.append({"doc": meta["name"], "reason": reason})
+            notes.append({"doc": meta["name"], "note": f"Set aside {meta['name']}: {reason}. No figures were taken from it."})
+            continue
         items = list(ex.line_items)
         for kind in ("production", "precursor_consumption", "fuel", "export", "precursor_purchase", "electricity"):
             items, dropped = _drop_total_rows(items, kind)
@@ -149,6 +179,10 @@ def normalise(docs: list[tuple[dict, DocumentExtraction]], profile: dict) -> Nor
             if (it.confidence if it.confidence is not None else 1.0) < 0.75:
                 out.low_confidence.append(eid)
             if it.quantity is None:
+                continue
+            if it.kind in _PERIOD_KINDS and _outside(it, ex, p0, p1):
+                out.out_of_period.append(eid)
+                notes.append({"doc": meta["name"], "note": f"Left out '{it.description}' ({it.quantity:g} {it.unit or ''}): dated outside the reporting period."})
                 continue
             months = _month_keys(it.period_start or ex.period_start, it.period_end or ex.period_end, ex.document_date)
             try:

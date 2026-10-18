@@ -98,12 +98,12 @@ function onEvent(ev) {
   const li = traceItem(ev);
   if (li) $("#trace").append(li);
   if (ev.type === "doc_start") upsertDoc({ id: ev.doc, name: ev.name, state: "reading" });
-  if (ev.type === "doc_done") upsertDoc({ id: ev.doc, name: ev.name, source: ev.source, doc_type: ev.doc_type, items: ev.items.length, error: ev.error });
+  if (ev.type === "doc_done") upsertDoc({ id: ev.doc, name: ev.name, source: ev.source, doc_type: ev.doc_type, items: ev.items.length, error: ev.error, set_aside: ev.set_aside, set_aside_reason: ev.set_aside_reason });
   if (ev.type === "stage") setStatus(ev.text, true);
   if (ev.type === "result") { refresh(false); setPhase(2); }
   if (ev.type === "tool_call" && ev.agent === "advisor_agent") setPhase(3);
   if (ev.type === "done") { setStatus(""); refresh(true); setPhase(4); }
-  if (ev.type === "error") setStatus("Something stopped the analysis: " + ev.text);
+  if (ev.type === "error") showStop(ev.text);
 }
 
 function traceItem(ev) {
@@ -114,7 +114,8 @@ function traceItem(ev) {
     case "stage": li.className = "tr stage"; li.textContent = ev.text; return li;
     case "doc_start": return null;
     case "doc_done": {
-      const head = ev.source === "error" ? `Could not read <b>${esc(ev.name)}</b>: ${esc(ev.error)}`
+      const head = ev.set_aside ? `Set aside <b>${esc(ev.name)}</b>: ${esc(ev.set_aside_reason || "not an invoice, bill, statement or register")}. No figures taken from it.`
+        : ev.source === "error" ? `Could not read <b>${esc(ev.name)}</b>: ${esc(ev.error)}`
         : `Read <b>${esc(ev.name)}</b> as ${esc(DOC_TYPES[ev.doc_type] || ev.doc_type)}${ev.issuer ? " from " + esc(ev.issuer) : ""}: ${ev.items.length} figure${ev.items.length === 1 ? "" : "s"}`
           + (ev.languages?.length > 1 ? ` · ${esc(ev.languages.join(" + "))}` : "") + (ev.source === "replayed" ? ` <span class="sev medium">replayed</span>` : "");
       const items = ev.items.slice(0, 8).map((i) => `<li>${esc(i.description)}: <b>${esc(i.quantity ?? "–")} ${esc(i.unit ?? "")}</b>${i.confidence < 0.75 ? ` <span class="sev medium">check</span>` : ""}</li>`).join("");
@@ -169,6 +170,12 @@ function setPhase(n) {
   });
 }
 
+/* The run stopped before a result (e.g. no factory records among the files): say why and what to upload. */
+function showStop(text) {
+  $("#status").innerHTML = `<div class="stop"><b>We couldn’t calculate a figure yet.</b><p>${esc(text)}</p><button type="button" class="btn small primary" data-pick="add-input">Add documents</button></div>`;
+  $("#status .stop button").onclick = () => $("#add-input").click();
+}
+
 function setStatus(text, busy = false) {
   $("#status").innerHTML = text ? (busy ? '<span class="spin" aria-hidden="true"></span>' : "") + esc(text) : "";
 }
@@ -189,6 +196,7 @@ function upsertDoc(d) {
   if (doc.source === "gemini") { state = `${DOC_TYPES[doc.doc_type] || "Read"} · ${doc.items} figure${doc.items === 1 ? "" : "s"}`; cls = "ok"; }
   if (doc.source === "replayed") { state = `Replayed · ${doc.items} figures`; cls = "warn"; }
   if (doc.source === "error") { state = "Could not read"; cls = "err"; }
+  if (doc.set_aside) { state = "Set aside · not a business record"; cls = "warn"; }
   li.innerHTML = `<button class="doc" data-doc="${doc.id}">${img}<span><span class="name">${esc(doc.name)}</span><span class="state ${cls}">${esc(state)}</span></span></button>`;
   li.querySelector("button").onclick = () => openDoc(doc.id);
 }

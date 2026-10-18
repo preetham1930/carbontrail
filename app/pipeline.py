@@ -77,7 +77,9 @@ class Doc:
         return {"id": self.id, "name": self.name, "mime": self.mime, "size": len(self.data),
                 "source": self.source, "error": self.error,
                 "doc_type": self.extraction.doc_type if self.extraction else None,
-                "items": len(self.extraction.line_items) if self.extraction else 0}
+                "items": len(self.extraction.line_items) if self.extraction else 0,
+                "set_aside": bool(self.extraction and not self.extraction.is_source_record),
+                "set_aside_reason": self.extraction.not_a_record_reason if self.extraction and not self.extraction.is_source_record else None}
 
 
 @dataclass
@@ -172,6 +174,8 @@ async def _intake_one(run: Run, doc: Doc, sem: asyncio.Semaphore) -> None:
             "type": "doc_done", "doc": doc.id, "name": doc.name, "source": doc.source, "error": doc.error,
             "agent": "document_intake_agent",
             "doc_type": ex.doc_type if ex else None,
+            "set_aside": bool(ex and not ex.is_source_record),
+            "set_aside_reason": (ex.not_a_record_reason if ex and not ex.is_source_record else None),
             "issuer": ex.issuer if ex else None,
             "languages": ex.languages if ex else [],
             "items": [{"kind": i.kind, "description": i.description, "quantity": i.quantity, "unit": i.unit,
@@ -198,6 +202,8 @@ async def analyse(run: Run, docs: list[Doc] | None = None, agents: bool = True) 
         run.normalized = normalise([({"id": d.id, "name": d.name}, d.extraction) for d in ok], run.profile)
         for n in run.normalized.notes:
             await run.emit({"type": "note", "text": n["note"], "doc": n.get("doc")})
+        if not run.normalized.calc_input.goods:
+            raise CalcError(_nothing_to_calculate(run.normalized))
         run.findings = run_checks(run.normalized, run.profile)
         run.ctx = AnalysisContext(run.normalized, run.findings)
         # Deterministic result first: the UI never waits on an LLM for numbers.
@@ -233,6 +239,16 @@ async def analyse(run: Run, docs: list[Doc] | None = None, agents: bool = True) 
         log.exception("run failed")
         run.status, run.error = "error", str(e)
         await run.emit({"type": "error", "text": str(e)})
+
+
+def _nothing_to_calculate(norm) -> str:
+    msg = ""
+    if norm.set_aside:
+        names = "; ".join(f"{x['doc']} ({x['reason']})" for x in norm.set_aside)
+        msg = f"These files don't look like factory records, so nothing was taken from them: {names}. "
+    msg += ("No production figures were found for the reporting period, so there is nothing to calculate yet. "
+            "Upload your production register plus fuel invoices, steel mill statements and export invoices, as photos or PDFs.")
+    return msg
 
 
 def fallback_briefs(run: Run) -> dict:

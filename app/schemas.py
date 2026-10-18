@@ -50,6 +50,12 @@ class LineItem(BaseModel):
 
 
 class DocumentExtraction(BaseModel):
+    is_source_record: bool = Field(default=True, description=(
+        "True only if this file is an original business record of a factory: an invoice, bill, statement, "
+        "register or logbook page, delivery or export document, or a supplier's emissions declaration. "
+        "False for screenshots of websites, apps or dashboards, design mock-ups, slides, brochures, posters, "
+        "marketing pages, illustrative or sample content, charts, and photos that are not a document."))
+    not_a_record_reason: Optional[str] = Field(default=None, description="When is_source_record is false: one short sentence saying what the file is instead.")
     doc_type: DocType
     issuer: Optional[str] = None
     recipient: Optional[str] = None
