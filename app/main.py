@@ -106,9 +106,15 @@ async def _read_uploads(files: list[UploadFile]) -> list[tuple[str, str, bytes]]
 async def create_run(background: BackgroundTasks, profile: str = Form("{}"), use_samples: bool = Form(False),
                      files: list[UploadFile] = File(default=[])):
     try:
-        prof = {**DEMO_PROFILE, **json.loads(profile or "{}")}
+        given = json.loads(profile or "{}")
     except json.JSONDecodeError:
         raise HTTPException(400, "profile must be JSON")
+    if use_samples:
+        prof = {**DEMO_PROFILE, **given}
+    else:
+        # a factory's own paperwork: the period and company are read off the documents (profile_infer)
+        prof = {**DEMO_PROFILE, "company": "Your factory", "installation": "", "city": "", "price_quarter": None,
+                "auto": True, **given}
     uploads = await _read_uploads(files)
     if use_samples:
         for d in _sample_manifest():

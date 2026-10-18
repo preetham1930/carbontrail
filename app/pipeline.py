@@ -19,6 +19,7 @@ from .agents.factory import (AnalysisContext, build_analysis_pipeline, build_int
                              build_regulation_agent, build_supplier_agent)
 from .agents.runtime import parse_json, run_agent
 from .cbam.engine import CalcError, calculate, run_scenario, country_comparison
+from .profile_infer import infer_profile
 from .checks import run_checks
 from .normalize import normalise
 from .schemas import DocumentExtraction
@@ -154,7 +155,9 @@ async def _intake_one(run: Run, doc: Doc, sem: asyncio.Semaphore) -> None:
         await run.emit({"type": "doc_start", "doc": doc.id, "name": doc.name, "agent": "document_intake_agent"})
         try:
             parts = [
-                types.Part.from_text(text=f"Document file name: {doc.name}. Reporting period of interest: {run.profile.get('period_start')} to {run.profile.get('period_end')}."),
+                types.Part.from_text(text=f"Document file name: {doc.name}. " + (
+                    "Reporting period: not known yet; read every date exactly as written." if run.profile.get("auto")
+                    else f"Reporting period of interest: {run.profile.get('period_start')} to {run.profile.get('period_end')}.")),
                 types.Part.from_bytes(data=doc.data, mime_type=doc.mime),
             ]
             out = await run_with_fallback(build_intake_agent, parts, config.MODEL_INTAKE, config.TIMEOUT_INTAKE, label=doc.id)
@@ -203,6 +206,9 @@ async def analyse(run: Run, docs: list[Doc] | None = None, agents: bool = True) 
         ok = [d for d in run.docs if d.extraction]
         if not ok:
             raise CalcError("No document could be read.")
+        run.profile, pnotes = infer_profile(run.profile, [d.extraction for d in ok])
+        for t in pnotes:
+            await run.emit({"type": "note", "text": t})
         await run.emit({"type": "stage", "stage": "normalise", "text": "Converting units and linking every number to its source"})
         run.normalized = normalise([({"id": d.id, "name": d.name}, d.extraction) for d in ok], run.profile)
         for n in run.normalized.notes:

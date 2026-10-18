@@ -80,3 +80,19 @@ def test_corrected_register_line_becomes_a_finding():
     f = [f for f in run_checks(norm, PROFILE) if f["code"] == "low_confidence"]
     assert len(f) == 1 and f[0]["title"] == "A handwritten figure was corrected"
     assert "61.5 → 62.5" in f[0]["detail"] and "used 62.5 t" in f[0]["detail"]
+
+
+def test_own_uploads_take_period_and_company_from_the_documents():
+    from app.profile_infer import infer_profile
+    reg = DocumentExtraction(doc_type="production_register", issuer="Shree Balaji Fasteners Pvt. Ltd.", line_items=[
+        _item(period_start="2026-07-01", period_end="2026-07-31"), _item(period_start="2026-08-01", period_end="2026-08-31")])
+    fuel = DocumentExtraction(doc_type="fuel_invoice", issuer="Rajkot Petro", recipient="Shree Balaji Fasteners Pvt. Ltd.",
+                              document_date="2026-09-05", line_items=[_item(kind="fuel", description="FO", quantity=9000, unit="L", fuel_type="furnace_oil")])
+    old = DocumentExtraction(doc_type="export_invoice", issuer="Shree Balaji Fasteners Pvt. Ltd.", document_date="2026-04-10",
+                             line_items=[_item(kind="export", quantity=10, period_start=None)])
+    prof, notes = infer_profile({**PROFILE, "auto": True, "company": "Your factory"}, [reg, fuel, old])
+    assert (prof["period_start"], prof["period_end"], prof["price_quarter"]) == ("2026-07-01", "2026-09-30", "2026-Q3")
+    assert prof["company"] == "Shree Balaji Fasteners Pvt. Ltd."
+    assert "Q3 2026" in notes[0] and "1 dated figure fall" in notes[0]
+    # the bundled demo keeps its fixed profile
+    assert infer_profile(PROFILE, [reg])[0] == PROFILE
