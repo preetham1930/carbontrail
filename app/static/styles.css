@@ -299,6 +299,8 @@ input[type=range] { accent-color: var(--ember); width: 100%; }
 .supplier textarea, .supplier input[type=text] { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 11px; background: var(--paper); margin-top: 4px; }
 .supplier textarea { min-height: 240px; line-height: 1.5; }
 .row-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.row-btns.mail-row { align-items: center; margin-top: 8px; }
+.row-btns.mail-row > span { margin-right: 2px; }
 .done-tag { color: var(--verdant); font-weight: 700; }
 
 /* Live trace */

@@ -112,3 +112,27 @@ def test_hindi_register_without_codes_and_8_digit_export_codes_match_up():
     assert round(goods["731815"].production_t, 1) == 145.8 and goods["731815"].export_eu_t == 24.6
     assert round(goods["731816"].production_t, 1) == 16.2
     assert any("mapped to CN 7318 15" in n["note"] for n in norm.notes)
+
+
+def test_correction_described_only_in_the_readers_notes_is_still_flagged():
+    ex = DocumentExtraction(doc_type="production_register", reading_notes=[
+        "Row for May 2026 bolt production has an original entry '49.8' crossed out and corrected to '50.3' written above it."],
+        line_items=[_item(period_start="2026-05-01", period_end="2026-05-31", quantity=50.3, source_quote="50.3", confidence=0.95),
+                    _item(period_start="2026-04-01", period_end="2026-04-30", quantity=48.6, source_quote="48.6", confidence=0.95)])
+    norm = normalise([({"id": "D1", "name": "register.jpg"}, ex)], PROFILE)
+    f = [f for f in run_checks(norm, PROFILE) if f["code"] == "low_confidence"]
+    assert len(f) == 1 and "49.8 → 50.3" in f[0]["detail"]
+
+
+def test_precursor_name_is_plain_english():
+    from app.normalize import _precursor_name
+    assert _precursor_name("Wire rod consumption (तार रॉड खपत)") == "Wire rod"
+    assert _precursor_name("Wire rod issued") == "Wire rod"
+    assert _precursor_name("तार रॉड खपत") == ""
+
+
+def test_pdf_text_is_escaped_and_hindi_gets_its_font():
+    from app.exports import _px
+    assert _px("M&S <rod>") == "M&amp;S &lt;rod&gt;"
+    out = _px("मई 2026 | 50.3 टन")
+    assert "NotoDeva" in out and "50.3" in out

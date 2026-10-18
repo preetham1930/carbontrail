@@ -48,6 +48,30 @@ def _cn6(code, desc) -> str:
 _FIX_WORDS = re.compile(r"\b(correct(ed|ion)?|crossed|struck|overwrit\w*|cut out|scratched)\b", re.I)
 
 
+def _fix_notes(ex) -> list[list[float]]:
+    """Numbers in the reader's notes that describe a correction ("49.8 crossed out and replaced with 50.3")."""
+    out = []
+    for note in getattr(ex, "reading_notes", None) or []:
+        if _FIX_WORDS.search(note or "") or re.search(r"replaced|written above|over-?written|cut", note or "", re.I):
+            nums = [float(x.replace(",", "")) for x in re.findall(r"(?<![\d.])\d[\d,]*\.\d+|(?<![\d.,])\d{1,3}(?![\d.,])", note)]
+            if len(nums) >= 2:
+                out.append(nums)
+    return out
+
+
+def _fix_from_notes(fix_notes, qty) -> str:
+    """A figure the reader said was corrected: the value used, next to a close, different number in the same note."""
+    if qty is None:
+        return ""
+    for nums in fix_notes:
+        if any(abs(x - qty) < 1e-9 for x in nums):
+            others = [x for x in nums if abs(x - qty) > 1e-9 and abs(x - qty) <= 0.1 * abs(qty)]
+            if others:
+                return f"{others[0]:g} → {qty:g}"
+    return ""
+
+
+
 def _correction(quote, desc, qty, doc_type="") -> str:
     """A handwritten correction in a register: two close numbers side by side where the value read is one of them
     ("61.5 62.5" read as 62.5), or a line that says it was corrected. Returns "61.5 → 62.5" or "corrected entry", else ""."""
@@ -234,12 +258,13 @@ def normalise(docs: list[tuple[dict, DocumentExtraction]], profile: dict) -> Nor
             items, dropped = _drop_total_rows(items, kind)
             if dropped:
                 notes.append({"doc": meta["name"], "note": f"Ignored total row(s) {dropped} to avoid double counting; the individual rows are used."})
+        fix_notes = _fix_notes(ex)
         for it in items:
             n += 1
             eid = f"E{n}"
             evidence[eid] = Evidence(eid, meta["id"], meta["name"], ex.doc_type, it.page or 1, (it.source_quote or "")[:200],
                                      it.kind, it.description, it.quantity, it.unit, float(it.confidence or 0))
-            fix = _correction(it.source_quote, it.description, it.quantity, ex.doc_type)
+            fix = _correction(it.source_quote, it.description, it.quantity, ex.doc_type) or _fix_from_notes(fix_notes, it.quantity)
             if fix:
                 out.corrections[eid] = fix
             if (it.confidence if it.confidence is not None else 1.0) < 0.75 or fix:
@@ -328,7 +353,8 @@ def normalise(docs: list[tuple[dict, DocumentExtraction]], profile: dict) -> Nor
             t, desc, ev = purchases[cn]["t"], purchases[cn]["desc"], purchases[cn]["ev"]
             notes.append({"doc": "-", "note": f"No consumption figure for precursor {cn}; using purchases ({t:.3f} t) as a proxy. Stock changes are ignored."})
         supplier = purchases.get(cn, {}).get("supplier", "")
-        p = PrecursorInput(id=f"P{cn}", cn=cn, description=_clean_desc(desc or "") or "Wire rod", consumed_t=round(t, 6), supplier=supplier, evidence=ev)
+        name = _precursor_name(desc) or _precursor_name(purchases.get(cn, {}).get("desc")) or ("Wire rod" if cn == "7213" else f"Precursor (CN {cn})")
+        p = PrecursorInput(id=f"P{cn}", cn=cn, description=name, consumed_t=round(t, 6), supplier=supplier, evidence=ev)
         for it, eid in _direct_first(supplier_see, notes, evidence):
             cn_ok = normalise_cn(it.cn_code or cn)[:4] == cn
             if cn_ok and it.quantity is not None and p.see_actual is None:
@@ -378,6 +404,23 @@ def _clean_desc(text: str) -> str:
     t = re.sub(r"\(\s*\)", " ", t)
     t = re.sub(r"\s{2,}", " ", t).strip(" -,:;")
     return t or (text or "").strip()
+
+
+_LEDGER_RE = re.compile(r"\b(consumption|consumed|issued|issue|used|usage|purchased|purchase|received|supplied|bought|delivered)\b", re.I)
+_NON_LATIN_RE = re.compile(r"[\u0900-\u0DFF\u0E00-\u0FFF\u3000-\u9FFF\uAC00-\uD7AF]")
+
+
+def _precursor_name(desc: str | None) -> str:
+    """'Wire rod consumption (तार रॉड खपत)' -> 'Wire rod': the material in plain English, without the ledger
+    verb or a translation in brackets. Empty when nothing English is left (the caller falls back)."""
+    t = _clean_desc(desc or "")
+    t = re.sub(r"\([^)]*\)", lambda m: " " if _NON_LATIN_RE.search(m.group(0)) else m.group(0), t)
+    t = _LEDGER_RE.sub(" ", t)
+    t = re.sub(r"\b(?:to|for|in|into)\s+(?:the\s+)?(?:production|shop floor|plant|process|forging)\b", " ", t, flags=re.I)
+    t = re.sub(r"\s{2,}", " ", t).strip(" -,:;/|")
+    if not re.search(r"[A-Za-z]{2}", t) or _NON_LATIN_RE.search(t):
+        return ""
+    return t[:1].upper() + t[1:]
 
 
 def _is_indirect(it: LineItem) -> bool:

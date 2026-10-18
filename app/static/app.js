@@ -255,7 +255,7 @@ function renderHeader(r) {
   const bases = r.precursors.map((p) => p.basis).join(", ");
   $("#see-basis").innerHTML = `${num(r.activity_level_t, 1)} t of fasteners · wire rod on <b>${esc(bases || "n/a")}</b>`;
   const [qy, qq] = String(r.price.quarter).split("-");
-  $("#money-k").textContent = `Gross CBAM cost of the ${num(r.totals.export_eu_t, 0)} t shipped to the EU this period, at the ${qq} ${qy} certificate price of EUR ${num(r.price.eur_per_t, 2)}/t`;
+  $("#money-k").textContent = `Gross CBAM cost of the ${num(r.totals.export_eu_t, Number.isInteger(Math.round(r.totals.export_eu_t * 10) / 10) ? 0 : 1)} t shipped to the EU this period, at the ${qq} ${qy} certificate price of EUR ${num(r.price.eur_per_t, 2)}/t`;
   $("#cost-actual").textContent = eur(r.totals.gross_cost_actual_eur);
   $("#cost-default").textContent = eur(r.totals.gross_cost_default_eur);
   const sav = r.totals.saving_eur;
@@ -467,6 +467,17 @@ async function runScenario() {
 }
 
 /* ---------- supplier ---------- */
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); return true; } catch { /* older browsers, or no permission */ }
+  const ta = Object.assign(document.createElement("textarea"), { value: t });
+  ta.style.cssText = "position:fixed;opacity:0";
+  document.body.appendChild(ta); ta.select();
+  let ok = false;
+  try { ok = document.execCommand("copy"); } catch { ok = false; }
+  ta.remove();
+  return ok;
+}
+
 function renderSupplier(run) {
   const r = run.result;
   const p = r.precursors[0];
@@ -483,7 +494,8 @@ function renderSupplier(run) {
       <h3>1. Ask the mill for its verified figure</h3>
       <p class="small muted">The supplier data agent drafts a request that names the exact fields the EU method needs. You review and send it yourself.</p>
       ${req ? `<label class="small">Subject<input type="text" id="sup-subj" value="${esc(req.subject)}"></label><label class="small">Message<textarea id="sup-body">${esc(req.body)}</textarea></label>
-        <div class="row-btns"><button class="btn small" id="sup-copy">Copy message</button><a class="btn small ghost" id="sup-mail" href="#">Open in email</a><button class="btn small ghost" id="sup-draft">Draft again</button></div>`
+        <div class="row-btns"><button class="btn small" id="sup-copy">Copy message</button><button class="btn small ghost" id="sup-draft">Draft again</button></div>
+        <div class="row-btns mail-row"><span class="small muted">Open as a new email in</span><a class="btn small ghost" id="sup-gmail" target="_blank" rel="noopener">Gmail</a><a class="btn small ghost" id="sup-outlook" target="_blank" rel="noopener">Outlook</a><a class="btn small ghost" id="sup-mail">Mail app</a></div>`
       : `<div class="row-btns"><button class="btn small primary" id="sup-draft">Draft the request</button></div>`}
     </div>
     <div class="step-card">
@@ -496,8 +508,18 @@ function renderSupplier(run) {
   $("#sup-draft").onclick = draftSupplier;
   $("#sup-pick").onclick = () => $("#sup-upload").click();
   if (req) {
-    $("#sup-copy").onclick = () => navigator.clipboard.writeText(`${$("#sup-subj").value}\n\n${$("#sup-body").value}`).then(() => ($("#sup-copy").textContent = "Copied"));
-    $("#sup-mail").onclick = (e) => { e.preventDefault(); location.href = `mailto:?subject=${encodeURIComponent($("#sup-subj").value)}&body=${encodeURIComponent($("#sup-body").value)}`; };
+    $("#sup-copy").onclick = () => copyText(`${$("#sup-subj").value}\n\n${$("#sup-body").value}`).then((ok) => ($("#sup-copy").textContent = ok ? "Copied" : "Select and copy the text"));
+    // real links (not script navigation), refreshed as the person edits: Gmail and Outlook open in the browser,
+    // so they work on computers with no mail program set up; "Mail app" uses the computer's default one.
+    const links = () => {
+      const su = encodeURIComponent($("#sup-subj").value), bo = encodeURIComponent($("#sup-body").value.replace(/\r?\n/g, "\r\n"));
+      $("#sup-gmail").href = `https://mail.google.com/mail/?view=cm&fs=1&su=${su}&body=${bo}`;
+      $("#sup-outlook").href = `https://outlook.office.com/mail/deeplink/compose?subject=${su}&body=${bo}`;
+      $("#sup-mail").href = `mailto:?subject=${su}&body=${bo}`;
+    };
+    links();
+    $("#sup-subj").oninput = links;
+    $("#sup-body").oninput = links;
   }
   $("#sup-upload").onchange = (e) => e.target.files.length && addDocs({ files: e.target.files }).then((ok) => ok && goTab("summary"));
   $("#sup-demo").onclick = () => addDocs({ sample: "11_supplier_emissions_declaration.pdf" }).then((ok) => ok && goTab("summary"));
@@ -508,7 +530,7 @@ async function draftSupplier() {
   b.disabled = true; b.textContent = "Drafting…";
   let data = null;
   try {
-    const res = await fetch(`/api/runs/${S.runId}/supplier-request`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sender: "Operations Head, Verkam Fasteners" }) });
+    const res = await fetch(`/api/runs/${S.runId}/supplier-request`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sender: "Operations Head" }) });
     data = res.ok ? await res.json() : null;
   } catch { data = null; }
   if (!data) { b.disabled = false; b.textContent = "Draft the request"; setStatus("The supplier data agent could not be reached. Try again in a minute."); return; }
