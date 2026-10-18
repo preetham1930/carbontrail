@@ -217,7 +217,11 @@
 .j-bill.verified b { color: #3BE19A; }
 
 .j-progress { position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%); list-style: none; margin: 0; padding: 8px 10px; display: flex; gap: 4px; background: rgba(255, 255, 255, .8); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-radius: 999px; box-shadow: 0 8px 30px -14px rgba(0, 0, 0, .3); }
-.j-progress li { font-size: 12px; font-weight: 600; color: #86868B; padding: 6px 12px; border-radius: 999px; transition: background .3s, color .3s; white-space: nowrap; }
+.j-progress li { font-size: 12px; font-weight: 600; color: #86868B; padding: 0; border-radius: 999px; transition: background .3s, color .3s; white-space: nowrap; }
+.j-progress button, .h-progress button { all: unset; display: block; padding: 6px 12px; border-radius: 999px; cursor: pointer; color: inherit; font: inherit; }
+.j-progress li:not(.on) button:hover { background: rgba(0, 0, 0, .06); color: #1D1D1F; }
+.h-progress li:not(.on) button:hover { background: rgba(255, 255, 255, .1); color: #F5F5F7; }
+.j-progress button:focus-visible, .h-progress button:focus-visible { outline: 2px solid #0071E3; outline-offset: 2px; }
 .j-progress li.done { color: #1D1D1F; }
 .j-progress li.on { background: #1D1D1F; color: #F5F5F7; }
 
@@ -230,7 +234,8 @@
   .j-step p:not(.j-k) { font-size: 15px; }
   .j-k { font-size: 13px; margin-bottom: 6px; }
   .j-progress { bottom: 18px; padding: 6px; gap: 2px; }
-  .j-progress li { font-size: 10px; padding: 5px 7px; }
+  .j-progress li { font-size: 10px; }
+  .j-progress button { padding: 5px 7px; }
   .j-bill { min-width: 0; padding: 10px 14px 12px; }
   .j-bill b { font-size: 24px; }
 }
@@ -312,7 +317,7 @@
 .h-file em { font-style: normal; font-size: 13px; color: #A1A1A6; }
 
 .h-progress { position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%); list-style: none; margin: 0; padding: 8px 10px; display: flex; gap: 4px; background: rgba(29, 29, 31, .8); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-radius: 999px; border: 1px solid rgba(255, 255, 255, .08); }
-.h-progress li { font-size: 12px; font-weight: 600; color: #6E6E73; padding: 6px 12px; border-radius: 999px; transition: background .3s, color .3s; white-space: nowrap; }
+.h-progress li { font-size: 12px; font-weight: 600; color: #6E6E73; padding: 0; border-radius: 999px; transition: background .3s, color .3s; white-space: nowrap; }
 .h-progress li.done { color: #F5F5F7; }
 .h-progress li.on { background: #F5F5F7; color: #1D1D1F; }
 
@@ -331,7 +336,8 @@
   .h-step p:not(.h-k) { font-size: 15px; }
   .h-k { font-size: 13px; margin-bottom: 6px; }
   .h-progress { bottom: 18px; padding: 6px; gap: 2px; }
-  .h-progress li { font-size: 10px; padding: 5px 8px; }
+  .h-progress li { font-size: 10px; }
+  .h-progress button { padding: 5px 8px; }
   .h-card, .h-file { width: 200px; padding: 10px 12px; }
   .h-card b { font-size: 17px; }
   .h-formula { width: 250px; padding: 12px 14px; gap: 4px; }

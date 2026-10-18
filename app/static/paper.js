@@ -21,6 +21,17 @@ function init() {
 
   const steps = $$(".h-step", section);
   const prog = $$("#h-progress li", section);
+
+  // The chapter pills jump to their stage: scroll the page to that point of the section, so the story plays there.
+  prog.forEach((li) => {
+    const b = li.querySelector("button");
+    if (!b) return;
+    b.addEventListener("click", () => {
+      const top = section.getBoundingClientRect().top + scrollY;
+      const span = Math.max(0, section.offsetHeight - innerHeight);
+      scrollTo({ top: top + parseFloat(b.dataset.p) * span, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    });
+  });
   const tags = Object.fromEntries($$("[data-anchor]", section).map((el) => [el.dataset.anchor, el]));
 
   /* story stages: intro, read, check, calculate, trace, prove */

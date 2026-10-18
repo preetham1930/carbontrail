@@ -14,7 +14,7 @@ Built by **Team Verdant** for the Google Cloud AI Builder Cup 2026 (JAPAC) · Tr
 
 Since **1 January 2026**, EU importers of iron & steel, aluminium, cement and fertilisers pay for the carbon embedded in what they buy (Regulation (EU) 2023/956, definitive period). The importer can only use the exporter's own figure if the exporter supplies installation-level data calculated with the EU method (Implementing Regulation (EU) 2025/2547) and verified by an accredited verifier. Otherwise, the importer must use the EU **default value plus a mark-up** of 10% in 2026, 20% in 2027 and 30% from 2028 (IR (EU) 2025/2621).
 
-The rule is European, but the cost lands on Asia's exporters: India, China, Viet Nam, Indonesia, Korea, Japan, Taiwan and Thailand all ship steel to the EU. For a fastener maker in Ludhiana, Rajkot or Bekasi, the data the EU method needs lives on paper: photographed LPG invoices, a mill's statement of supplies, a production register written in Hindi and English. Their EU buyers increasingly move to suppliers who can produce the numbers. Fastmarkets estimates India alone will bear about 18% of all CBAM costs.
+The rule is European, but the cost lands on Asia's exporters, from India and China to Viet Nam, Indonesia and Thailand. Big steel mills have carbon teams; the small factories that make bolts, nuts and wire products usually don't. For a fastener maker in Ludhiana, Rajkot or Bekasi, the data the EU method needs lives on paper: photographed LPG invoices, a mill's statement of supplies, a production register written in Hindi and English. Their EU buyers increasingly move to suppliers who can produce the numbers. Fastmarkets estimates India alone will bear about 18% of all CBAM costs.
 
 ## What CarbonTrail does
 
