@@ -96,3 +96,19 @@ def test_own_uploads_take_period_and_company_from_the_documents():
     assert "Q3 2026" in notes[0] and "1 dated figure fall" in notes[0]
     # the bundled demo keeps its fixed profile
     assert infer_profile(PROFILE, [reg])[0] == PROFILE
+
+
+def test_hindi_register_without_codes_and_8_digit_export_codes_match_up():
+    reg = DocumentExtraction(doc_type="production_register", period_start="2026-04-01", period_end="2026-06-30", line_items=[
+        _item(description="बोल्ट (टन) अप्रैल", cn_code=None, quantity=48.6, period_start="2026-04-01", period_end="2026-04-30"),
+        _item(description="बोल्ट (टन) मई", cn_code=None, quantity=50.3, period_start="2026-05-01", period_end="2026-05-31"),
+        _item(description="बोल्ट (टन) जून", cn_code=None, quantity=46.9, period_start="2026-06-01", period_end="2026-06-30"),
+        _item(description="बोल्ट (टन)", cn_code=None, quantity=145.8, period_start="2026-04-01", period_end="2026-06-30"),  # unlabelled total
+        _item(description="नट (टन) अप्रैल", cn_code=None, quantity=16.2, period_start="2026-04-01", period_end="2026-04-30")])
+    exp = DocumentExtraction(doc_type="export_invoice", document_date="2026-04-30", line_items=[
+        _item(kind="export", description="Hex bolts M12 DIN 933", cn_code="7318 15 88", quantity=24600, unit="kg", destination_country="Germany")])
+    norm = normalise([({"id": "D1", "name": "register.jpg"}, reg), ({"id": "D2", "name": "inv.png"}, exp)], PROFILE)
+    goods = {g.cn: g for g in norm.calc_input.goods}
+    assert round(goods["731815"].production_t, 1) == 145.8 and goods["731815"].export_eu_t == 24.6
+    assert round(goods["731816"].production_t, 1) == 16.2
+    assert any("mapped to CN 7318 15" in n["note"] for n in norm.notes)

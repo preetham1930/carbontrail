@@ -25,6 +25,26 @@ EU_COUNTRIES = {
 _TOTAL_RE = re.compile(r"\b(total|grand total|sub ?total|kul|योग|कुल)\b", re.I)
 
 
+# CBAM default values are set per 6-digit CN subheading, so goods are matched on 6 digits: an export invoice's
+# "7318 15 88" and a register's "7318 15" are the same good. A register that names the product but gives no code
+# ("बोल्ट", "Nuts") is mapped from the name, and the note asks the owner to confirm.
+_NAME_TO_CN = [
+    (re.compile(r"\b(bolts?|screws?)\b|बोल्ट|स्क्रू|स्क्रु|पेंच", re.I), "731815"),
+    (re.compile(r"\bnuts?\b|नट", re.I), "731816"),
+    (re.compile(r"\bwashers?\b|वॉशर|वाशर", re.I), "731822"),
+]
+
+
+def _cn6(code, desc) -> str:
+    cn = normalise_cn(code or "")[:6]
+    if len(cn) >= 4:
+        return cn
+    for rx, c in _NAME_TO_CN:
+        if rx.search(desc or ""):
+            return c
+    return cn
+
+
 _FIX_WORDS = re.compile(r"\b(correct(ed|ion)?|crossed|struck|overwrit\w*|cut out|scratched)\b", re.I)
 
 
@@ -138,6 +158,23 @@ def _drop_total_rows(items: list[LineItem], kind: str) -> tuple[list[LineItem], 
         keep = [i for i in items if i not in totals]
         dropped = [t.description for t in totals]
         return keep, dropped
+    # an unlabelled total: one row equal to the sum of the other rows of the same good, in the same unit
+    groups: dict = defaultdict(list)
+    for i in rows:
+        if i.quantity is not None:
+            key = _cn6(i.cn_code, i.description) if kind in ("production", "export", "precursor_consumption", "precursor_purchase") else ""
+            groups[(key, (i.unit or "").strip().lower())].append(i)
+    drop = []
+    for g in groups.values():
+        if len(g) < 3:
+            continue
+        for x in g:
+            rest = sum(float(o.quantity) for o in g if o is not x)
+            if rest > 0 and abs(float(x.quantity) - rest) <= 0.005 * rest:
+                drop.append(x)
+                break
+    if drop:
+        return [i for i in items if not any(i is d for d in drop)], [d.description for d in drop]
     return items, dropped
 
 
@@ -222,10 +259,12 @@ def normalise(docs: list[tuple[dict, DocumentExtraction]], profile: dict) -> Nor
                     elec_ev.append(eid)
                     out.electricity_months |= months
                 elif it.kind == "production":
-                    cn = normalise_cn(it.cn_code or "")
+                    cn = _cn6(it.cn_code, it.description)
                     if not cn:
                         notes.append({"doc": meta["name"], "note": f"Production line '{it.description}' has no CN code; please map it."})
                         continue
+                    if not normalise_cn(it.cn_code or ""):
+                        notes.append({"doc": meta["name"], "note": f"'{it.description}' has no CN code on the page; mapped to CN {cn[:4]} {cn[4:]} from its name. Please confirm."})
                     production[cn]["t"] += to_tonnes(it.quantity, it.unit or "t")
                     production[cn]["desc"] = production[cn]["desc"] or it.description
                     production[cn]["ev"].append(eid)
@@ -242,7 +281,7 @@ def normalise(docs: list[tuple[dict, DocumentExtraction]], profile: dict) -> Nor
                     purchases[cn]["ev"].append(eid)
                     purchases[cn]["supplier"] = purchases[cn]["supplier"] or (it.party or ex.issuer or "")
                 elif it.kind == "export":
-                    cn = normalise_cn(it.cn_code or "")
+                    cn = _cn6(it.cn_code, it.description)
                     dest = (it.destination_country or "").strip()
                     t = to_tonnes(it.quantity, it.unit or "t")
                     if dest.lower() in EU_COUNTRIES:
