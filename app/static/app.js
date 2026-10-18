@@ -276,11 +276,22 @@ function renderGoods(r) {
 }
 
 function renderOrigins(run) {
+  // Your own figure next to the EU default values. Your buyer uses your country's default unless you send actual data,
+  // so that row is the one to beat; the other countries are context.
   const rows = run.country_comparison || [];
   const me = run.result.see;
+  const home = (run.profile && run.profile.country) || "";
   const max = Math.max(...rows.map((r) => r.default_2026), me) * 1.05;
-  const all = [...rows.map((r) => ({ label: r.country, v: r.default_2026 })), { label: "You", v: me, me: true }].sort((a, b) => a.v - b.v);
-  $("#origins").innerHTML = all.map((r) => `<div class="origin ${r.me ? "me" : ""}"><span>${esc(r.label)}</span><span class="bar-o"><span style="width:${(r.v / max) * 100}%"></span></span><span>${num(r.v, 2)}</span></div>`).join("");
+  const all = [...rows.map((r) => ({ label: r.country, v: r.default_2026, home: r.country === home })), { label: "You", v: me, me: true }]
+    .sort((a, b) => a.v - b.v);
+  const tag = (r) => (r.me ? '<i class="o-tag me">your actual data</i>' : r.home ? '<i class="o-tag home">your default today</i>' : "");
+  $("#origins").innerHTML = all.map((r) => `<div class="origin ${r.me ? "me" : r.home ? "home" : ""}"><span>${esc(r.label)}${tag(r)}</span><span class="bar-o"><span style="width:${(r.v / max) * 100}%"></span></span><span>${num(r.v, 2)}</span></div>`).join("");
+  const def = rows.find((r) => r.country === home);
+  $("#origins-note").textContent = def
+    ? (me < def.default_2026
+      ? `Without your data, your buyer uses ${home}'s default of ${num(def.default_2026, 2)}. Your own figure, ${num(me, 2)}, is ${Math.round((1 - me / def.default_2026) * 100)}% lower.`
+      : `Your own figure, ${num(me, 2)}, is above ${home}'s default of ${num(def.default_2026, 2)}. Your buyer can still use the default; the levers below show how to bring your figure down.`)
+    : "";
 }
 
 function renderSteps(r) {

@@ -231,6 +231,18 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .origin .bar-o span { position: absolute; inset: 0 auto 0 0; background: var(--gold); border-radius: 99px; }
 .origin.me .bar-o span { background: var(--verdant); }
 .origin.me { font-weight: 700; }
+.origin { grid-template-columns: 150px 1fr 44px; }
+.origin > span:first-child { display: flex; flex-direction: column; line-height: 1.15; }
+.origin .bar-o span { background: #C9C2B2; }
+.origin .bar-o { background: #F1EFEA; }
+.origin.home .bar-o { background: var(--gold-wash); }
+.origin.home .bar-o span { background: var(--gold); }
+.origin.me .bar-o span { background: var(--verdant); }
+.origin.home { font-weight: 700; }
+.o-tag { font-style: normal; font-weight: 500; font-size: .7rem; color: var(--muted, #6E6E73); }
+.o-tag.home { color: var(--gold); } .o-tag.me { color: var(--verdant); }
+.origins-note { margin-top: 12px; font-size: .86rem; line-height: 1.45; }
+@media (max-width: 420px) { .origin { grid-template-columns: 112px 1fr 40px; } }
 
 /* Steps */
 .steps { list-style: none; padding: 0; margin: 18px 0; display: grid; gap: 10px; counter-reset: s; }
