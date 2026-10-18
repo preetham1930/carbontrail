@@ -119,9 +119,17 @@ def run_checks(norm: Normalized, profile: dict) -> list[dict]:
 
     for eid in norm.low_confidence:
         ev = norm.evidence[eid]
-        add("low_confidence", "medium", "A number was hard to read",
-            f"'{ev.description}' on {ev.doc_name} p.{ev.page} was read with low confidence ({ev.confidence:.0%}).",
-            evidence=[eid], action="Check this value against the original document.")
+        fix = norm.corrections.get(eid)
+        if fix:
+            seen = f" ({fix})" if "→" in fix else ""
+            add("low_confidence", "medium", "A handwritten figure was corrected",
+                f"'{ev.description}' on {ev.doc_name} p.{ev.page} shows a correction{seen}. "
+                f"CarbonTrail used {ev.quantity:g} {ev.unit or ''}".rstrip() + "; a person should confirm it.",
+                evidence=[eid], action="Check this value against the original register.")
+        else:
+            add("low_confidence", "medium", "A number was hard to read",
+                f"'{ev.description}' on {ev.doc_name} p.{ev.page} was read with low confidence ({ev.confidence:.0%}).",
+                evidence=[eid], action="Check this value against the original document.")
 
     order = {"high": 0, "medium": 1, "low": 2, "info": 3}
     findings.sort(key=lambda f: order[f["severity"]])

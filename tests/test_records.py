@@ -61,3 +61,22 @@ def test_agent_finding_merges_with_the_check_it_explains():
     # a check already merged into another finding is not taken twice; an unrelated finding merges with nothing
     assert match_covers({"title": "Wire rod again"}, "", auto, {"precursor_default"}) == []
     assert match_covers({"title": "Export prices look low"}, "", auto, set()) == []
+
+
+def test_handwritten_correction_is_flagged_even_when_read_confidently():
+    from app.normalize import _correction
+    reg = "production_register"
+    assert _correction("61.5 62.5", "Bolts (7318 15)", 62.5, reg) == "61.5 → 62.5"
+    assert _correction("Bolts (May-26) - corrected from 61.5", "Bolts", 62.5, reg) == "61.5 → 62.5"
+    assert _correction("Apr-26 60.1", "Bolts (7318 15)", 60.1, reg) == ""
+    assert _correction("May-26 89.9 62.5", "Bolts", 62.5, reg) == ""          # different columns, not a correction
+    assert _correction("120.0 118.4", "Bolts", 120.0, "export_invoice") == ""  # only registers are handwritten
+
+
+def test_corrected_register_line_becomes_a_finding():
+    ex = DocumentExtraction(doc_type="production_register", line_items=[
+        _item(period_start="2026-05-01", period_end="2026-05-31", quantity=62.5, source_quote="61.5 62.5", confidence=0.95)])
+    norm = normalise([({"id": "D1", "name": "07_register.jpg"}, ex)], PROFILE)
+    f = [f for f in run_checks(norm, PROFILE) if f["code"] == "low_confidence"]
+    assert len(f) == 1 and f[0]["title"] == "A handwritten figure was corrected"
+    assert "61.5 → 62.5" in f[0]["detail"] and "used 62.5 t" in f[0]["detail"]

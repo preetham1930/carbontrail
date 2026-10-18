@@ -25,6 +25,25 @@ EU_COUNTRIES = {
 _TOTAL_RE = re.compile(r"\b(total|grand total|sub ?total|kul|योग|कुल)\b", re.I)
 
 
+_FIX_WORDS = re.compile(r"\b(correct(ed|ion)?|crossed|struck|overwrit\w*|cut out|scratched)\b", re.I)
+
+
+def _correction(quote, desc, qty, doc_type="") -> str:
+    """A handwritten correction in a register: two close numbers side by side where the value read is one of them
+    ("61.5 62.5" read as 62.5), or a line that says it was corrected. Returns "61.5 → 62.5" or "corrected entry", else ""."""
+    q = quote or ""
+    if qty and doc_type == "production_register":
+        for a, b in re.findall(r"(?<![\d.])(\d+\.\d+)\s*(?:→|->|/|\s)\s*(\d+\.\d+)(?![\d.])", q):
+            a, b = float(a), float(b)
+            old = a if abs(b - qty) < 1e-9 else b if abs(a - qty) < 1e-9 else None
+            if old is not None and old != qty and abs(old - qty) <= 0.1 * abs(qty):
+                return f"{old:g} → {qty:g}"
+    if _FIX_WORDS.search(f"{q} {desc or ''}"):
+        m = re.search(r"from\s+(\d+(?:\.\d+)?)", f"{q} {desc or ''}", re.I)
+        return f"{float(m.group(1)):g} → {qty:g}" if (m and qty) else "corrected entry"
+    return ""
+
+
 @dataclass
 class Evidence:
     id: str
@@ -54,6 +73,7 @@ class Normalized:
     electricity_months: set[str] = field(default_factory=set)
     fuel_months: set[str] = field(default_factory=set)
     low_confidence: list[str] = field(default_factory=list)
+    corrections: dict[str, str] = field(default_factory=dict)  # evidence id -> what the correction looks like ("61.5 → 62.5")
     supplier_names: list[str] = field(default_factory=list)
     set_aside: list[dict] = field(default_factory=list)       # files that are not business records
     out_of_period: list[str] = field(default_factory=list)    # evidence ids dated outside the reporting period
@@ -176,7 +196,10 @@ def normalise(docs: list[tuple[dict, DocumentExtraction]], profile: dict) -> Nor
             eid = f"E{n}"
             evidence[eid] = Evidence(eid, meta["id"], meta["name"], ex.doc_type, it.page or 1, (it.source_quote or "")[:200],
                                      it.kind, it.description, it.quantity, it.unit, float(it.confidence or 0))
-            if (it.confidence if it.confidence is not None else 1.0) < 0.75:
+            fix = _correction(it.source_quote, it.description, it.quantity, ex.doc_type)
+            if fix:
+                out.corrections[eid] = fix
+            if (it.confidence if it.confidence is not None else 1.0) < 0.75 or fix:
                 out.low_confidence.append(eid)
             if it.quantity is None:
                 continue
