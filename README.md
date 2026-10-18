@@ -1,5 +1,7 @@
 # CarbonTrail
 
+![CarbonTrail: Paper in. Proof out.](docs/banner.jpg)
+
 **Paper in. Proof out.** CarbonTrail turns a small steel manufacturer's electricity bills, fuel invoices, purchase statements and handwritten production registers into EU CBAM embedded-emissions data that an accredited verifier can trace back to the source page.
 
 Built by **Team Verdant** for the Google Cloud AI Builder Cup 2026 (JAPAC) · Track: **Manufacturing: Intelligent Operations & Industrial Efficiency**
@@ -17,9 +19,9 @@ For a fastener maker in Ludhiana, Rajkot or Bekasi, that data lives on paper: ph
 ## What CarbonTrail does
 
 1. **Reads the paperwork.** Gemini (multimodal) reads each photo or PDF in parallel and extracts every relevant quantity with the exact quote and page it came from. It handles skewed photos, handwriting, crossed-out corrections and mixed scripts.
-2. **Checks it like a verifier.** A scope & quality agent checks CBAM scope, period coverage, wire-rod balance and yield, fuel attribution, non-EU shipments and hard-to-read numbers.
+2. **Checks it like a verifier.** A scope & quality agent checks CBAM scope, period coverage, wire-rod balance and yield, fuel attribution, non-EU shipments and hard-to-read numbers. A handwritten correction in the register is always flagged for a person to confirm, and a file that is not a business record (a screenshot or mock-up) is set aside, never calculated.
 3. **Calculates exactly.** A deterministic engine applies the EU method. **The language models never do arithmetic.** Every figure shows its formula, its working and links to its source evidence (`E12` → photo of the register, page 1, "May-26 62.5").
-4. **Explains the money.** Your SEE vs the EU default with mark-up, gross certificate exposure in euros at the quarterly CBAM price, and ranked levers tested with what-if simulations (supplier, fuel, yield, year).
+4. **Explains the money.** Your SEE vs the EU default with mark-up, gross certificate cost in euros at the CBAM price of the quarter of import, the estimated amount payable after the free-allocation adjustment, and ranked levers tested with what-if simulations (supplier, fuel, yield, year).
 5. **Acts on the biggest gap.** About 87% of a fastener's footprint is the purchased wire rod. The supplier data agent drafts the request to the mill; when the mill's verified declaration comes back, CarbonTrail reads it and recalculates (demo: 5.36 → 3.25 tCO2e/t; on one quarter's 160 t of EU shipments, the gross CBAM cost falls from €73,865 on EU default values to €39,162, a saving of €34,703).
 6. **Hands over the evidence.** An Excel data pack mirroring the sections of the Commission's Communication Template, and a PDF evidence pack with every step, quote and finding, ready for the verifier.
 
@@ -56,7 +58,7 @@ flowchart LR
 
 ### Why the numbers can be trusted
 - The engine (`app/cbam/engine.py`) implements `Em = AD × NCV × EF × OxF`, attribution to the production process, `EE = M × SEE_precursor` and `SEE = (AttrEm + EE_InpMat) / AL`.
-- `tests/test_engine.py` checks the engine against a worked example computed by hand. `tests/test_pipeline.py` runs the whole agent pipeline offline with a scripted model.
+- `tests/test_engine.py` checks the engine against a worked example computed by hand. `tests/test_pipeline.py` runs the whole agent pipeline offline with a scripted model. `tests/test_records.py` covers set-aside files, out-of-period figures, handwritten corrections and merged findings.
 - Every value in `app/cbam/data/reference.json` carries its source. Values that still need checking against the Official Journal are flagged `verify: true` (for example, the India wire-rod precursor default).
 - Diesel burned in a DG set is excluded, because it is an electricity emission and only direct emissions count for iron & steel goods (Annex II). The agents explain this; the engine enforces it.
 
