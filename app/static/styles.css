@@ -389,3 +389,5 @@ input[type=range] { accent-color: var(--ember); width: 100%; }
 .ruler .mark.edge-r b { transform: none; }
 .ruler .mark.edge-l { transform: translateX(-1px); justify-items: start; }
 .ruler .mark.edge-l b { transform: none; }
+
+.privacy-note { margin: 10px 0 0; font-size: .78rem; color: var(--steel); text-align: center; }

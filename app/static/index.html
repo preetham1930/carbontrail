@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=20261018b">
-<link rel="stylesheet" href="/landing.css?v=20261018b">
+<link rel="stylesheet" href="/styles.css?v=20261018c">
+<link rel="stylesheet" href="/landing.css?v=20261018c">
 <link rel="modulepreload" href="/vendor/three.module.min.js">
 </head>
 <body class="mode-landing">
@@ -24,7 +24,7 @@
   </a>
   <nav class="bar-nav" aria-label="Main">
     <a class="nav-l only-landing" href="#journey">The journey</a>
-    <a class="nav-l only-landing" href="#explode">How it works</a>
+    <a class="nav-l only-landing" href="#how">How it works</a>
     <a class="nav-l only-landing" href="#paper">Documents</a>
     <a class="nav-l only-landing" href="#agents">Agents</a>
     <a class="nav-l only-landing" href="#stack">Google Cloud</a>
@@ -35,13 +35,12 @@
   </nav>
   <div class="menu-sheet" id="menu" hidden>
     <a class="only-landing" href="#journey">The journey</a>
-    <a class="only-landing" href="#explode">How it works</a>
+    <a class="only-landing" href="#how">How it works</a>
     <a class="only-landing" href="#paper">Documents</a>
     <a class="only-landing" href="#agents">Agents</a>
     <a class="only-landing" href="#stack">Google Cloud</a>
     <button type="button" data-open="ask">Ask about CBAM</button>
     <a href="https://github.com/preetham1930/carbontrail" target="_blank" rel="noopener">Source code on GitHub</a>
-    <a href="#team" class="only-landing">Team &amp; contact</a>
   </div>
 </header>
 
@@ -50,18 +49,17 @@
   <section id="landing" class="landing" aria-label="CarbonTrail">
     <canvas id="scene" aria-hidden="true"></canvas>
 
-    <!-- 3D stage: hero + exploded view share one canvas -->
+    <!-- 3D stage: the hero bolt, the journey and how it works -->
     <div class="stage3d" id="stage">
       <section class="hero" id="hero">
         <p class="hero-eyebrow">CarbonTrail</p>
         <h1><span class="g-steel">Paper in.</span> <span class="g-proof">Proof out.</span></h1>
-        <p class="hero-sub">EU carbon border data for steel exporters,<br class="br-d"> built from the paperwork they already have.</p>
+        <p class="hero-sub">EU carbon border data for small steel manufacturers,<br class="br-d"> built from the paperwork they already have.</p>
         <div class="hero-ctas">
           <button class="pill-btn big" id="run-demo" data-run-demo type="button">Run the demo factory</button>
           <button type="button" class="text-link" data-pick="file-input">Upload your documents <span aria-hidden="true">›</span></button>
           <input type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.webp" hidden>
         </div>
-        <p class="hero-note">Powered by Gemini 3.8 Flash and Google ADK on Cloud Run. Uploads are deleted automatically within two days.</p>
       </section>
 
       <section class="journey" id="journey" aria-label="The journey of one container of bolts to Europe">
@@ -80,27 +78,35 @@
             <article class="j-step" data-step="2"><p class="j-k">03 · The crossing</p><h2>Then, the long way to Europe.</h2><p>The carbon crosses the sea with the goods. Since 2026, Europe counts it.</p></article>
             <article class="j-step" data-step="3"><p class="j-k">04 · The EU border</p><h2>Here, carbon has a price.</h2><p>With no data of its own, the buyer pays on the EU default value plus a 10% mark-up: <b class="amber">€73,865</b> gross this quarter.</p></article>
             <article class="j-step" data-step="4"><p class="j-k">05 · With CarbonTrail</p><h2>The proof travels with it.</h2><p>Actual figures, each traced to its page and ready for the verifier. The same shipments: <b class="green">€39,162</b>.</p></article>
-            <article class="j-step" data-step="5"><p class="j-k">06 · Delivered</p><h2>Delivered. <span class="green">€34,703</span> saved.</h2><p>One quarter, one fastener exporter. The saving holds after the free-allocation adjustment. Now take CarbonTrail apart.</p></article>
+            <article class="j-step" data-step="5"><p class="j-k">06 · Delivered</p><h2>Delivered. <span class="green">€34,703</span> saved.</h2><p>One quarter, one fastener exporter. The saving holds after the free-allocation adjustment. Here is how CarbonTrail gets there.</p></article>
           </div>
           <ol class="j-progress" id="j-progress" aria-hidden="true"><li>Factory</li><li>Paperwork</li><li>Sea</li><li>EU border</li><li>Proof</li><li>Delivered</li></ol>
         </div>
       </section>
 
-      <section class="explode" id="explode" aria-label="How CarbonTrail works, part by part">
-        <div class="explode-pin">
-          <div class="ex-head">
-            <p class="ex-eyebrow">How it works</p>
-            <h2 class="ex-title">Take it apart.</h2>
-            <p class="ex-sub">Five parts. One number you can prove.</p>
+      <section class="how" id="how" aria-label="How CarbonTrail works, from paper to proof">
+        <div class="how-pin">
+          <canvas id="how-canvas" aria-hidden="true"></canvas>
+          <div class="h-labels" aria-hidden="true">
+            <div class="h-card" data-anchor="read"><small>Read by Gemini · page 1 · 97% sure</small><b>LPG · 19,800 kg</b><q>LPG (bulk) for industrial use … 19,800 KG</q></div>
+            <span class="h-badge ok" data-anchor="b-lpg"><i></i>Furnace fuel · counted</span>
+            <span class="h-badge ok" data-anchor="b-wire"><i></i>270 t wire rod · precursor</span>
+            <span class="h-badge warn" data-anchor="b-reg"><i></i>61.5 → 62.5 · ask a human</span>
+            <span class="h-badge off" data-anchor="b-diesel"><i></i>Generator diesel · not counted</span>
+            <div class="h-formula" data-anchor="calc"><small>Step 1 · Combustion, LPG</small><code>Em = AD × NCV × EF × OxF</code><span>19.8 t × 47.3 GJ/t × 63.1 tCO2/TJ × 1.0</span><b>= 59.10 tCO2</b><i class="h-rule"></i><small>All steps · specific embedded emissions</small><b class="h-big">5.36 <em>tCO2e per tonne</em></b></div>
+            <span class="h-tag" data-anchor="trace">E4 · page 1 · “… 19,800 KG”</span>
+            <div class="h-file xlsx" data-anchor="xlsx"><i>XLSX</i><b>CBAM data pack</b><em>Laid out like the EU template</em></div>
+            <div class="h-file pdf" data-anchor="pdf"><i>PDF</i><b>Evidence pack</b><em>Every figure with its page and quote</em></div>
           </div>
-          <ol class="callouts" id="callouts">
-            <li class="co" data-part="0" data-side="l"><span class="co-n">01 · Read</span><span class="co-t">Gemini reads every page.</span><span class="co-b">Photos, PDFs and handwriting in Hindi and English, each figure with its quote and page.</span><i class="co-line"></i></li>
-            <li class="co" data-part="1" data-side="r"><span class="co-n">02 · Check</span><span class="co-t">Agents audit like a verifier.</span><span class="co-b">Scope, missing months, the steel-in, bolts-out balance and which fuel went where.</span><i class="co-line"></i></li>
-            <li class="co" data-part="2" data-side="l"><span class="co-n">03 · Calculate</span><span class="co-t">Exact code, not the model.</span><span class="co-b">Em = AD × NCV × EF × OxF. The EU method, the same answer every time.</span><i class="co-line"></i></li>
-            <li class="co" data-part="3" data-side="r"><span class="co-n">04 · Trace</span><span class="co-t">Every figure threads back.</span><span class="co-b">Tap any number and the source document opens at the exact words Gemini read.</span><i class="co-line"></i></li>
-            <li class="co" data-part="4" data-side="l"><span class="co-n">05 · Prove</span><span class="co-t">Ready for the verifier.</span><span class="co-b">An Excel data pack shaped like the EU template, and a PDF evidence pack.</span><i class="co-line"></i></li>
-          </ol>
-          <p class="ex-final" id="ex-final">Reassembled. Ready to verify.</p>
+          <div class="h-copy" id="h-copy">
+            <article class="h-step" data-step="0"><p class="h-k">How it works</p><h2>From paper to proof.</h2><p>Five steps turn a photographed invoice into a number a verifier can check.</p></article>
+            <article class="h-step" data-step="1"><p class="h-k">01 · Read</p><h2>Gemini reads every page.</h2><p>Photos, PDFs and handwriting in Hindi and English. Each figure keeps its quote, page and confidence.</p></article>
+            <article class="h-step" data-step="2"><p class="h-k">02 · Check</p><h2>Agents audit like a verifier.</h2><p>Scope, missing months, steel in against bolts out, and which fuel went where. A corrected entry goes to a human.</p></article>
+            <article class="h-step" data-step="3"><p class="h-k">03 · Calculate</p><h2>Exact code, not the model.</h2><p>The EU method, run in code. The same answer every time, with the working shown.</p></article>
+            <article class="h-step" data-step="4"><p class="h-k">04 · Trace</p><h2>Every figure threads back.</h2><p>Tap any number and the source opens at the exact words Gemini read.</p></article>
+            <article class="h-step" data-step="5"><p class="h-k">05 · Prove</p><h2>Ready for the verifier.</h2><p>An Excel data pack laid out like the EU template, and a PDF evidence pack.</p></article>
+          </div>
+          <ol class="h-progress" id="h-progress" aria-hidden="true"><li>Read</li><li>Check</li><li>Calculate</li><li>Trace</li><li>Prove</li></ol>
         </div>
       </section>
     </div>
@@ -213,7 +219,7 @@
       <section class="sec dark final" id="final">
         <div class="wrap center">
           <h2 class="final-title reveal"><span class="g-steel">Paper in.</span> <span class="g-proof">Proof out.</span></h2>
-          <p class="sec-body reveal">Ten realistic documents from a fastener exporter in Ludhiana. Watch the agents work, open the evidence, then send the mill’s reply.</p>
+          <p class="sec-body reveal">Upload your own invoices, bills and registers, or try it first on a sample fastener factory.</p>
           <div class="hero-ctas reveal">
             <button class="pill-btn big" data-run-demo type="button">Run the demo factory</button>
             <button type="button" class="text-link" data-pick="file-input">Upload your documents <span aria-hidden="true">›</span></button>
@@ -230,11 +236,10 @@
             <li id="privacy"><b>Your documents.</b> Uploads are used only to run your analysis. They are stored in a private Cloud Storage bucket and deleted automatically within two days (a one-day storage lifecycle rule); only the summary figures and file names are kept. This is a hackathon demo, so please don’t upload documents you are not allowed to share.</li>
           </ol>
           <div class="foot-cols">
-            <div><p>Product</p><a href="#journey">The journey</a><a href="#explode">How it works</a><a href="#paper">Documents</a><button type="button" class="foot-btn" data-run-demo>Run the demo</button></div>
+            <div><p>Product</p><a href="#journey">The journey</a><a href="#how">How it works</a><a href="#paper">Documents</a><button type="button" class="foot-btn" data-run-demo>Run the demo</button></div>
             <div><p>Technology</p><a href="#agents">Agents</a><a href="#stack">Google Cloud</a><a href="https://github.com/preetham1930/carbontrail" target="_blank" rel="noopener">Source code</a></div>
-            <div id="team"><p>Team Verdant</p><span>Preetham Kukkadapu</span><span>Harshitha Neelam</span><span>Google Cloud AI Builder Cup 2026</span><a href="https://github.com/preetham1930/carbontrail/issues" target="_blank" rel="noopener">Contact us on GitHub</a></div>
           </div>
-          <p class="foot-copy">CarbonTrail · Manufacturing track · Built with Gemini, Google ADK and Cloud Run.</p>
+          <p class="foot-copy">© 2026 CarbonTrail</p>
         </div>
       </footer>
     </div>
@@ -249,6 +254,7 @@
       </div>
       <ul id="doc-list" class="doc-list"></ul>
       <button type="button" class="btn small ghost add-doc" data-pick="add-input">Add documents</button>
+      <p class="privacy-note">Used only for your analysis. Uploads are deleted within two days.</p>
       <input type="file" id="add-input" multiple accept=".pdf,.jpg,.jpeg,.png,.webp" hidden>
     </aside>
 
@@ -388,8 +394,9 @@
   <form id="ask-form" class="ask-form"><input id="ask-input" placeholder="Type a question" autocomplete="off" aria-label="Question"><button class="btn small primary">Ask</button></form>
 </dialog>
 
-<script src="/app.js?v=20261018b" defer></script>
-<script type="module" src="/landing.js?v=20261018b"></script>
-<script type="module" src="/journey.js?v=20261018b"></script>
+<script src="/app.js?v=20261018c" defer></script>
+<script type="module" src="/landing.js?v=20261018c"></script>
+<script type="module" src="/journey.js?v=20261018c"></script>
+<script type="module" src="/paper.js?v=20261018c"></script>
 </body>
 </html>

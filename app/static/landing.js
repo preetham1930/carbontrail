@@ -1,6 +1,6 @@
 // CarbonTrail landing — a product-page scroll story.
-// One WebGL canvas renders a machined steel bolt: a hero shot, then an exploded view where each part
-// of the bolt is one part of CarbonTrail (callouts are positioned next to the parts every frame).
+// The hero renders a machined steel bolt, the product our demo factory exports. The journey (journey.js)
+// and "how it works" (paper.js) have their own canvases; this file also runs the sections below them.
 import * as THREE from "/vendor/three.module.min.js";
 import { RoomEnvironment } from "/vendor/RoomEnvironment.js";
 
@@ -11,36 +11,22 @@ const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const smooth = (a, b, v) => { const t = clamp((v - a) / (b - a)); return t * t * (3 - 2 * t); };
 const mix = (a, b, t) => a + (b - a) * t;
 
-const stage = $("#stage"), hero = $("#hero"), explode = $("#explode"), journeyEl = $("#journey");
-const exHead = $(".ex-head"), exFinal = $("#ex-final");
-const callouts = $$("#callouts .co");
+const stage = $("#stage"), hero = $("#hero");
 
 /* ------------------------------------------------------------------ */
 /* Scroll state                                                         */
 /* ------------------------------------------------------------------ */
-const S = { heroK: 0, t: 0, shift: 0, onStage: true };
+const S = { heroK: 0, shift: 0, onStage: true };
 function readScroll() {
-  const vh = innerHeight;
-  const top = stage.getBoundingClientRect().top;
-  const s = -top / vh;                                   // viewports scrolled into the stage
-  const heroH = hero.offsetHeight / vh;
-  const er = explode.getBoundingClientRect();
-  S.heroK = clamp(s / heroH);                             // 0 → 1 while the hero scrolls away
-  S.t = clamp(-er.top / Math.max(1, er.height - vh));     // 0 → 1 across the pinned exploded view
-  // pixels the exploded view is offset from its pinned spot while it scrolls in or out (the 3D canvas is fixed, so it rides along)
-  S.shift = (er.top > 0 && er.top < vh) ? er.top : Math.min(0, er.bottom - vh);
-  S.onStage = stage.getBoundingClientRect().bottom > 0;
-  const jr = journeyEl ? journeyEl.getBoundingClientRect() : null;
-  S.covered = !!jr && jr.top <= 0 && jr.bottom >= vh;     // the journey section hides the bolt
+  const hr = hero.getBoundingClientRect();
+  S.heroK = clamp(-hr.top / Math.max(1, hr.height));     // 0 → 1 while the hero scrolls away
+  S.shift = Math.min(0, hr.top);                          // the canvas is fixed: the bolt rides up with the hero
+  S.onStage = hr.bottom > 0;                              // the journey covers everything after the hero
   document.body.classList.toggle("past-stage", !S.onStage);
 }
 addEventListener("scroll", readScroll, { passive: true });
 addEventListener("resize", readScroll);
 readScroll();
-
-/* exploded-view timeline (t = 0..1 across the pinned section) */
-const explodeK = (t) => smooth(0.1, 0.48, t) * (1 - smooth(0.78, 0.94, t));
-const PART_SHOW = [0.16, 0.24, 0.32, 0.4, 0.48];
 
 /* ------------------------------------------------------------------ */
 /* Sections after the stage                                             */
@@ -107,7 +93,6 @@ try {
   document.documentElement.classList.add("no-webgl");
 }
 if (renderer) startScene(renderer);
-else stepCallouts(null);
 
 function startScene(renderer) {
   const small = () => innerWidth < 820;
@@ -147,82 +132,33 @@ function startScene(renderer) {
   resize();
 
   let running = true, last = performance.now(), time = 0;
-  const cur = { heroK: S.heroK, t: S.t };
-  const v = new THREE.Vector3();
+  const cur = { heroK: S.heroK };
 
   function frame(now) {
     if (!running) return;
     requestAnimationFrame(frame);
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
-    if (!S.onStage || S.covered || document.hidden) return;
+    if (!S.onStage || document.hidden) return;
     time += reduceMotion ? 0 : dt;
     const f = reduceMotion ? 1 : 1 - Math.pow(0.002, dt);
     cur.heroK += (S.heroK - cur.heroK) * f;
-    cur.t += (S.t - cur.t) * f;
-    const h = cur.heroK, t = cur.t, mobile = small();
-    const e = explodeK(t);
+    const h = cur.heroK, mobile = small();
 
-    /* layout: lying product shot under the hero text → upright and exploded → reassembled */
-    const settle = smooth(0, 1, h);
-    const rise = 1 - smooth(0, 0.16, t);                    // starts low, clear of the "Take it apart" heading
-    anchor.position.set(0, mix(mobile ? -1.75 : -1.45, mobile ? 0.75 : -0.12, settle) - (mobile ? 0.8 : 1.0) * rise * settle, 0);
-    camera.setViewOffset(innerWidth, innerHeight, 0, -S.shift * settle, innerWidth, innerHeight);
-    anchor.scale.setScalar(mix(mobile ? 0.55 : 0.82, mobile ? 0.5 : 0.82, settle));
-    camera.position.z = mix(10, mix(10.5, 12.2, e), settle);
+    /* a product shot lying under the hero text; it turns a little as the page scrolls */
+    anchor.position.set(0, mobile ? -1.75 : -1.45, 0);
+    camera.setViewOffset(innerWidth, innerHeight, 0, -S.shift, innerWidth, innerHeight);
+    anchor.scale.setScalar(mobile ? 0.55 : 0.82);
+    camera.position.z = 10;
     px += (tx - px) * 0.05; py += (ty - py) * 0.05;
-    tilt.rotation.set(mix(0.25, 0.1, settle) + py * 0.12, px * 0.25, mix(-1.22, mix(-0.12, 0, e), settle));
-    const spinY = time * mix(0.35, 0.12, settle) + t * Math.PI * 1.2;
-
-    /* explode */
-    const off = [[0, 1.45, 0], [0, 0.72, 0], [-0.6, 0, 0], [0.62, 0, 0], [0, -1.25, 0]];
-    parts.forEach((p, i) => {
-      p.group.position.set(off[i][0] * e, off[i][1] * e, off[i][2] * e);
-      p.group.rotation.y = spinY + (i === 3 ? -e * Math.PI * 2 : 0);   // all parts turn together; the thread also unscrews
-    });
+    tilt.rotation.set(0.25 + py * 0.12, px * 0.25, -1.22);
+    const spinY = time * 0.35 + h * Math.PI * 0.8;
+    parts.forEach((p) => { p.group.rotation.y = spinY; });
 
     renderer.render(scene, camera);
-    stepCallouts({ parts, camera, e, t, mobile });
   }
   requestAnimationFrame(frame);
 
   document.addEventListener("ct:workspace", () => { running = false; renderer.dispose(); }, { once: true });
-}
-
-/* ------------------------------------------------------------------ */
-/* Callouts follow the parts                                            */
-/* ------------------------------------------------------------------ */
-const RADIUS = [1.02, 0.94, 0.48, 0.52, 0.46];
-const CENTER_Y = [1.67, 1.33, -0.2, -0.33, -1.78];
-const tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
-function stepCallouts(ctx) {
-  const t = ctx ? ctx.t : S.t;
-  const e = ctx ? ctx.e : explodeK(t);
-  exHead.classList.toggle("away", t > 0.1);
-  exFinal.classList.toggle("on", t > 0.86);
-  let cur = -1;
-  callouts.forEach((li, i) => {
-    const show = t > PART_SHOW[i] && t < 0.8;
-    li.classList.toggle("on", show);
-    if (show) cur = i;
-    if (!ctx || ctx.mobile || !show) return;
-    const g = ctx.parts[i].group;
-    g.localToWorld(tmp.set(0, CENTER_Y[i], 0));
-    const dist = tmp2.copy(tmp).sub(ctx.camera.position).length();
-    tmp.project(ctx.camera);
-    const W = innerWidth, H = innerHeight;
-    const cx = (tmp.x + 1) / 2 * W, cy = (1 - tmp.y) / 2 * H;
-    const ppu = H / (2 * dist * Math.tan(THREE.MathUtils.degToRad(ctx.camera.fov / 2)));
-    const r = RADIUS[i] * g.parent.parent.scale.x * ppu;
-    const side = li.dataset.side === "l" ? -1 : 1;
-    const ax = cx + side * r, boxW = 290, gap = 14;
-    let lw = Math.max(36, Math.min(140, W * 0.06));
-    let left = side < 0 ? ax - lw - gap - boxW : ax + lw + gap;
-    left = clamp(left, 18, W - boxW - 18);
-    lw = side < 0 ? ax - (left + boxW) - gap : left - gap - ax;
-    li.style.setProperty("--lw", `${Math.max(12, lw)}px`);
-    li.style.transform = `translate(${left.toFixed(1)}px, ${(cy - 22).toFixed(1)}px)`;
-  });
-  callouts.forEach((li, i) => li.classList.toggle("cur", i === cur));
 }
 
 /* ------------------------------------------------------------------ */
@@ -265,6 +201,5 @@ function buildBolt() {
   tipMesh.position.y = -1.58 - 0.2;
   const tip = part(tipMesh);
 
-  /* offsets in explode() are relative to these assembled positions */
-  return [head, washer, shaft, thread, tip];
+    return [head, washer, shaft, thread, tip];
 }
