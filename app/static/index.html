@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=20261018c">
-<link rel="stylesheet" href="/landing.css?v=20261018c">
+<link rel="stylesheet" href="/styles.css?v=20261018d">
+<link rel="stylesheet" href="/landing.css?v=20261018d">
 <link rel="modulepreload" href="/vendor/three.module.min.js">
 </head>
 <body class="mode-landing">
@@ -23,24 +23,20 @@
     <span>CarbonTrail</span>
   </a>
   <nav class="bar-nav" aria-label="Main">
-    <a class="nav-l only-landing" href="#journey">The journey</a>
+    <a class="nav-l only-landing" href="#why">Why CBAM</a>
     <a class="nav-l only-landing" href="#how">How it works</a>
-    <a class="nav-l only-landing" href="#paper">Documents</a>
-    <a class="nav-l only-landing" href="#agents">Agents</a>
-    <a class="nav-l only-landing" href="#stack">Google Cloud</a>
+    <a class="nav-l only-landing" href="#proof">The money</a>
+    <a class="nav-l only-landing" href="#faq">Questions</a>
     <button class="nav-l" data-open="ask" type="button">Ask about CBAM</button>
-    <a class="nav-l" href="https://github.com/preetham1930/carbontrail" id="repo-link" target="_blank" rel="noopener">GitHub</a>
     <button class="pill-btn only-landing" data-run-demo type="button">Run the demo</button>
     <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Menu"><span></span><span></span></button>
   </nav>
   <div class="menu-sheet" id="menu" hidden>
-    <a class="only-landing" href="#journey">The journey</a>
+    <a class="only-landing" href="#why">Why CBAM</a>
     <a class="only-landing" href="#how">How it works</a>
-    <a class="only-landing" href="#paper">Documents</a>
-    <a class="only-landing" href="#agents">Agents</a>
-    <a class="only-landing" href="#stack">Google Cloud</a>
+    <a class="only-landing" href="#proof">The money</a>
+    <a class="only-landing" href="#faq">Questions</a>
     <button type="button" data-open="ask">Ask about CBAM</button>
-    <a href="https://github.com/preetham1930/carbontrail" target="_blank" rel="noopener">Source code on GitHub</a>
   </div>
 </header>
 
@@ -52,14 +48,15 @@
     <!-- 3D stage: the hero bolt, the journey and how it works -->
     <div class="stage3d" id="stage">
       <section class="hero" id="hero">
-        <p class="hero-eyebrow">CarbonTrail</p>
+        <p class="hero-eyebrow">CBAM evidence for small steel manufacturers</p>
         <h1><span class="g-steel">Paper in.</span> <span class="g-proof">Proof out.</span></h1>
-        <p class="hero-sub">EU carbon border data for small steel manufacturers,<br class="br-d"> built from the paperwork they already have.</p>
+        <p class="hero-sub">Your factory already has the numbers. We turn the paperwork<br class="br-d"> into emissions data your EU buyer can trace.</p>
         <div class="hero-ctas">
-          <button class="pill-btn big" id="run-demo" data-run-demo type="button">Run the demo factory</button>
+          <button class="pill-btn big" id="run-demo" data-run-demo type="button">See your paper become proof</button>
           <button type="button" class="text-link" data-pick="file-input">Upload your documents <span aria-hidden="true">›</span></button>
           <input type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.webp" hidden>
         </div>
+        <p class="hero-note">No carbon team required. Start with what you have.</p>
       </section>
 
       <section class="journey" id="journey" aria-label="The journey of one container of bolts to Europe">
@@ -115,21 +112,22 @@
     <div class="after">
       <section class="sec light" id="why">
         <div class="wrap">
-          <p class="sec-eyebrow reveal">Why now</p>
-          <h2 class="sec-title reveal">Carbon now has a price<br class="br-d"> at the EU border.<sup class="fn"><a href="#fn3">3</a></sup></h2>
+          <p class="sec-eyebrow reveal">The border has changed. Your paperwork hasn’t.</p>
+          <h2 class="sec-title reveal">No emissions figure?<br class="br-d"> Your buyer pays for the default.<sup class="fn"><a href="#fn3">3</a></sup></h2>
           <div class="bento">
-            <article class="tile t-wide reveal"><p class="t-k">Since 1 January 2026</p><p class="t-big">CBAM is live.</p><p class="t-b">EU importers of steel, aluminium, cement and fertiliser now pay for the carbon embedded in what they buy.</p></article>
+            <article class="tile t-wide reveal"><p class="t-k">Since 1 January 2026</p><p class="t-big">CBAM is live.</p><p class="t-b">EU importers of steel, aluminium, cement and fertiliser now pay for the carbon embedded in what they buy. That’s CBAM, the EU Carbon Border Adjustment Mechanism.</p></article>
             <article class="tile t-dark reveal"><p class="t-k">CBAM certificate, Q2 2026</p><p class="t-big g-ember">€75.28</p><p class="t-b">per tonne of CO2e, for goods imported that quarter. Q3: €82.32.</p></article>
-            <article class="tile reveal"><p class="t-k">No data, a penalty</p><p class="t-big t-nowrap">+10%<span class="t-arrow">→</span>30%</p><p class="t-b">mark-up on EU default values, 2026 to 2028.</p></article>
-            <article class="tile t-wide t-proof reveal"><p class="t-k">The way out</p><p class="t-big">Verified, own data.</p><p class="t-b">The exporter’s figure counts only if it follows the EU method and an accredited verifier can check it. CarbonTrail builds exactly that.</p></article>
+            <article class="tile reveal"><p class="t-k">The default gets more expensive</p><p class="t-big t-nowrap">+10%<span class="t-arrow">→</span>30%</p><p class="t-b">penalty mark-up on the EU default value, 2026 to 2028.</p></article>
+            <article class="tile t-wide t-proof reveal"><p class="t-k">The risk</p><p class="t-big">The expensive supplier.</p><p class="t-b">Your buyer can use your own figure only when it follows the EU method and an accredited verifier has checked it. Without it, you become the costly option, and your buyer has a reason to switch.</p></article>
           </div>
         </div>
       </section>
 
       <section class="sec dark" id="paper">
         <div class="wrap">
-          <p class="sec-eyebrow reveal">The documents</p>
-          <h2 class="sec-title reveal">The data was always there.<br class="br-d"> On paper.</h2>
+          <p class="sec-eyebrow reveal">Start with your everyday records</p>
+          <h2 class="sec-title reveal">You make bolts.<br class="br-d"> Not carbon reports.</h2>
+          <p class="sec-body reveal sec-lead">You already keep the bills, mill statements and production books. CarbonTrail reads what you have, so you don’t need a carbon team or a consultant-heavy project to get started. Built for fastener makers in Ludhiana, Rajkot, Bekasi and beyond.</p>
         </div>
         <div class="gallery" id="gallery" tabindex="0" aria-label="Documents CarbonTrail reads">
           <figure class="g-card"><img src="/samples/07_production_register_apr-jun.jpg" alt="Handwritten production register in Hindi and English" loading="lazy"><figcaption><b>A register written by hand.</b> Hindi and English, with a crossed-out 61.5 corrected to 62.5. Caught, and flagged for a human.</figcaption></figure>
@@ -145,9 +143,22 @@
         </div>
       </section>
 
+      <section class="sec light2" id="benefits">
+        <div class="wrap">
+          <p class="sec-eyebrow reveal">Less admin. A stronger paper trail.</p>
+          <h2 class="sec-title reveal">Keep your attention<br class="br-d"> on what you make.</h2>
+          <div class="agents">
+            <article class="ag-tile reveal"><p class="ag-k">Your records, not another reporting job</p><h3>Less retyping. More factory time.</h3><p>Start from the photos and PDFs you already have instead of rebuilding your records in a new spreadsheet.</p></article>
+            <article class="ag-tile reveal"><p class="ag-k">A review list, not false confidence</p><h3>Find the gaps before the questions.</h3><p>Missing bills, unclear entries and material mismatches show up while the source page is still at hand.</p></article>
+            <article class="ag-tile reveal"><p class="ag-k">More than a number in an email</p><h3>A clearer talk with your EU buyer.</h3><p>Explain the emissions figure and the money behind it, with evidence they can follow back to paper.</p></article>
+          </div>
+        </div>
+      </section>
+
       <section class="sec dark proof" id="proof">
         <div class="wrap center">
-          <p class="sec-eyebrow reveal">Proof out · demo factory</p>
+          <p class="sec-eyebrow reveal">What the numbers mean in euros · demo factory</p>
+          <h2 class="sec-title reveal">Same bolts. Different carbon bill.</h2>
           <p class="proof-big reveal"><span id="proof-count">3.25</span></p>
           <p class="proof-unit reveal">tCO2e per tonne of fasteners, from the factory’s own data and the mill’s verified figure.</p>
           <div class="ladder reveal" role="table" aria-label="CBAM cost of one quarter of EU shipments in three steps">
@@ -157,6 +168,7 @@
             <div class="ld-row green" role="row" style="--w:.53"><span role="cell"><b>+ the mill’s verified figure</b><em>2.36 replaces the 4.32 default</em></span><span role="cell" class="ld-see">3.25</span><span role="cell">€39,162</span><span role="cell">€23,144</span><i class="ld-bar" aria-hidden="true"></i></div>
           </div>
           <p class="ld-save reveal"><b class="g-proof">€34,703</b> less for the buyers in one quarter. The same before and after the free-allocation adjustment.</p>
+          <p class="ld-note reveal">Your own figure must follow the EU method and be checked by an accredited verifier. It is not always lower than the default; CarbonTrail shows you the difference either way.</p>
           <p class="foot-ref reveal">Fictional demo factory, Ludhiana: 160 t of bolts and nuts imported into the EU in April–June 2026, at the Q2 2026 certificate price of €75.28.<sup class="fn"><a href="#fn1">1</a></sup></p>
         </div>
       </section>
@@ -183,45 +195,50 @@
         </div>
       </section>
 
-      <section class="sec light2" id="agents">
-        <div class="wrap">
-          <p class="sec-eyebrow reveal">Google Agent Development Kit</p>
-          <h2 class="sec-title reveal">Six agents. One exact engine.</h2>
-          <div class="agents">
-            <article class="ag-tile reveal"><p class="ag-k">×N in parallel</p><h3>Document intake</h3><p>Reads each photo or PDF with Gemini’s structured output: quantity, unit, quote, page, confidence.</p></article>
-            <article class="ag-tile reveal"><p class="ag-k">Verifier mindset</p><h3>Scope &amp; quality</h3><p>Checks CBAM scope, coverage, wire-rod balance and fuel use, then records findings.</p></article>
-            <article class="ag-tile reveal"><p class="ag-k">Tools only</p><h3>Calculation</h3><p>Runs the EU method through the engine and explains every step.</p></article>
-            <article class="ag-tile reveal"><p class="ag-k">Euros, not jargon</p><h3>Advisor</h3><p>Tests levers: a cleaner mill, a different furnace fuel, less scrap, a later year.</p></article>
-            <article class="ag-tile reveal"><p class="ag-k">Closes the gap</p><h3>Supplier data</h3><p>Drafts the request to the steel mill for its verified, installation-level figure.</p></article>
-            <article class="ag-tile reveal"><p class="ag-k">Cited answers</p><h3>Regulation</h3><p>Answers CBAM questions from curated notes, with a citation for every claim.</p></article>
+      <section class="sec dark trust" id="trust">
+        <div class="wrap trust-split">
+          <div class="reveal">
+            <p class="sec-eyebrow">Built to be questioned</p>
+            <h2 class="sec-title">Audit-ready is a paper trail. Not a badge.</h2>
+            <p class="sec-body">CarbonTrail prepares traceable evidence. It is not an accredited verifier, and it does not certify your factory or your emissions figure.</p>
+            <p class="trust-line">Prepare with CarbonTrail. Verify with an accredited verifier.</p>
           </div>
+          <ul class="trust-list reveal">
+            <li><h3>Evidence you can inspect</h3><p>Original pages, exact quotes and source links stay attached to every figure.</p></li>
+            <li><h3>Maths you can follow</h3><p>Code applies the EU formula. Inputs, formula and working are visible, never hidden inside an AI answer.</p></li>
+            <li><h3>Review, not rubber-stamping</h3><p>Unclear handwriting, corrected entries and missing months are flagged for a person to confirm.</p></li>
+          </ul>
+        </div>
+        <div class="wrap">
+          <p class="under-hood reveal"><b>Under the hood.</b> Six Google ADK agents on Gemini 3.8 Flash (Vertex AI) read, check, calculate, advise, write to your mill and answer CBAM questions. An exact CBAM engine does every calculation in code. Runs on Cloud Run, with Cloud Storage and Firestore.</p>
         </div>
       </section>
 
-      <section class="sec light" id="stack">
-        <div class="wrap center">
-          <p class="sec-eyebrow reveal">Architecture</p>
-          <h2 class="sec-title reveal">Built on Google Cloud.<br class="br-d"> End to end.</h2>
-          <div class="arch reveal" role="img" aria-label="Browser to Cloud Run running FastAPI and Google ADK, which calls Gemini on Vertex AI and stores documents in Cloud Storage and results in Firestore.">
-            <div class="ar-node"><span>Client</span><b>Browser</b><em>Upload · live agent trace</em></div>
-            <i class="ar-link"></i>
-            <div class="ar-node core"><span>Cloud Run</span><b>FastAPI + Google ADK</b><em>Deterministic CBAM engine inside</em></div>
-            <i class="ar-link"></i>
-            <div class="ar-col">
-              <div class="ar-node"><span>Vertex AI</span><b>Gemini 3.8 Flash</b></div>
-              <div class="ar-node"><span>Cloud Storage</span><b>Documents</b></div>
-              <div class="ar-node"><span>Firestore</span><b>Results</b></div>
-            </div>
+      <section class="sec light faq" id="faq">
+        <div class="wrap faq-split">
+          <div class="reveal">
+            <p class="sec-eyebrow">Straight answers</p>
+            <h2 class="sec-title">Good questions. No fine-print answers.</h2>
+            <p class="sec-body">What a factory owner needs to know before the first upload.</p>
+          </div>
+          <div class="faq-list reveal">
+            <details open><summary>Do I need clean spreadsheets to start?</summary><p>No. Start with phone photos or PDFs of bills, invoices and registers. CarbonTrail reads skewed pages, handwriting and mixed-language records, including Hindi and English.</p></details>
+            <details><summary>What if a number is unclear or a month is missing?</summary><p>It is flagged for review, not quietly treated as reliable. You can check the source quote, add the missing bill or confirm a correction before relying on the result.</p></details>
+            <details><summary>Can my EU buyer use the result straight away?</summary><p>Your own figure counts only if it follows the EU method and an accredited verifier checks it. CarbonTrail gives you the data pack and the evidence trail for that check; it does not replace it.</p></details>
+            <details><summary>Does AI calculate my emissions?</summary><p>No. AI reads the documents and checks scope and quality. Exact code applies the EU formula, with every input and step linked to the original page.</p></details>
+            <details><summary>Will my own figure always cost less than the default?</summary><p>Not always. CarbonTrail shows the comparison in euros so you can see the difference. The figures on this page come from a fictional demo factory, not a promise of savings.</p></details>
+            <details><summary>What happens to my documents?</summary><p>They are used only to run your analysis, kept in a private Cloud Storage bucket and deleted automatically within two days. Only the summary figures and file names are kept.</p></details>
           </div>
         </div>
       </section>
 
       <section class="sec dark final" id="final">
         <div class="wrap center">
-          <h2 class="final-title reveal"><span class="g-steel">Paper in.</span> <span class="g-proof">Proof out.</span></h2>
-          <p class="sec-body reveal">Upload your own invoices, bills and registers, or try it first on a sample fastener factory.</p>
+          <p class="sec-eyebrow reveal">Your next step is already on your desk</p>
+          <h2 class="final-title reveal"><span class="g-steel">Start with a bill.</span> <span class="g-proof">Build a trail.</span></h2>
+          <p class="sec-body reveal">Upload your own invoices, bills and registers, or see it first on a sample fastener factory.</p>
           <div class="hero-ctas reveal">
-            <button class="pill-btn big" data-run-demo type="button">Run the demo factory</button>
+            <button class="pill-btn big" data-run-demo type="button">See your paper become proof</button>
             <button type="button" class="text-link" data-pick="file-input">Upload your documents <span aria-hidden="true">›</span></button>
           </div>
         </div>
@@ -236,10 +253,10 @@
             <li id="privacy"><b>Your documents.</b> Uploads are used only to run your analysis. They are stored in a private Cloud Storage bucket and deleted automatically within two days (a one-day storage lifecycle rule); only the summary figures and file names are kept. This is a hackathon demo, so please don’t upload documents you are not allowed to share.</li>
           </ol>
           <div class="foot-cols">
-            <div><p>Product</p><a href="#journey">The journey</a><a href="#how">How it works</a><a href="#paper">Documents</a><button type="button" class="foot-btn" data-run-demo>Run the demo</button></div>
-            <div><p>Technology</p><a href="#agents">Agents</a><a href="#stack">Google Cloud</a><a href="https://github.com/preetham1930/carbontrail" target="_blank" rel="noopener">Source code</a></div>
+            <div><p>Product</p><a href="#why">Why CBAM</a><a href="#how">How it works</a><a href="#proof">The money</a><a href="#faq">Questions</a><button type="button" class="foot-btn" data-run-demo>Run the demo</button></div>
+            <div><p>More</p><button type="button" class="foot-btn" data-open="ask">Ask about CBAM</button><a href="#trust">Under the hood</a><a href="https://github.com/preetham1930/carbontrail" target="_blank" rel="noopener">Source code</a></div>
           </div>
-          <p class="foot-copy">© 2026 CarbonTrail</p>
+          <p class="foot-copy">© 2026 CarbonTrail · Traceable evidence, not automatic certification. Independent accredited verification is required.</p>
         </div>
       </footer>
     </div>
@@ -394,9 +411,9 @@
   <form id="ask-form" class="ask-form"><input id="ask-input" placeholder="Type a question" autocomplete="off" aria-label="Question"><button class="btn small primary">Ask</button></form>
 </dialog>
 
-<script src="/app.js?v=20261018c" defer></script>
-<script type="module" src="/landing.js?v=20261018c"></script>
-<script type="module" src="/journey.js?v=20261018c"></script>
-<script type="module" src="/paper.js?v=20261018c"></script>
+<script src="/app.js?v=20261018d" defer></script>
+<script type="module" src="/landing.js?v=20261018d"></script>
+<script type="module" src="/journey.js?v=20261018d"></script>
+<script type="module" src="/paper.js?v=20261018d"></script>
 </body>
 </html>
