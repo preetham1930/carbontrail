@@ -14,7 +14,7 @@ Built by **Team Verdant** for the Google Cloud AI Builder Cup 2026 (JAPAC) · Tr
 
 Since **1 January 2026**, EU importers of iron & steel, aluminium, cement and fertilisers pay for the carbon embedded in what they buy (Regulation (EU) 2023/956, definitive period). The importer can only use the exporter's own figure if the exporter supplies installation-level data calculated with the EU method (Implementing Regulation (EU) 2025/2547) and verified by an accredited verifier. Otherwise, the importer must use the EU **default value plus a mark-up** of 10% in 2026, 20% in 2027 and 30% from 2028 (IR (EU) 2025/2621).
 
-The rule is European, but the cost lands on Asia's exporters, from India and China to Viet Nam, Indonesia and Thailand. Big steel mills have carbon teams; the small factories that make bolts, nuts and wire products usually don't. For a fastener maker in Ludhiana, Rajkot or Bekasi, the data the EU method needs lives on paper: photographed LPG invoices, a mill's statement of supplies, a production register written in Hindi and English. Their EU buyers increasingly move to suppliers who can produce the numbers. Fastmarkets estimates India alone will bear about 18% of all CBAM costs.
+The rule is European, but the cost lands on Asia's exporters, from India and China to Vietnam, Indonesia and Thailand. Big steel mills have carbon teams; the small factories that make bolts, nuts and wire products usually don't. For a fastener maker in Ludhiana, Rajkot or Bekasi, the data the EU method needs lives on paper: photographed LPG invoices, a mill's statement of supplies, a production register written in Hindi and English. Their EU buyers increasingly move to suppliers who can produce the numbers. Fastmarkets estimates India alone will bear about 18% of all CBAM costs.
 
 ## What CarbonTrail does
 
@@ -95,7 +95,7 @@ The script enables the APIs, creates a least-privilege service account (Vertex A
 - CarbonTrail prepares verification-ready data. It does not replace the accredited verifier or the EU declarant.
 
 ## Roadmap
-UK CBAM (from 1 January 2027) output from the same data, India CCTS reconciliation, country packs (grid factors, languages) for Viet Nam, Indonesia, Thailand and Malaysia, direct export of the official Communication Template, and a WhatsApp intake channel for factory owners.
+UK CBAM (from 1 January 2027) output from the same data, India CCTS reconciliation, country packs (grid factors, languages) for Vietnam, Indonesia, Thailand and Malaysia, direct export of the official Communication Template, and a WhatsApp intake channel for factory owners.
 
 ## Sources
 Regulation (EU) 2023/956 and 2025/2083; Implementing Regulations (EU) 2025/2547, 2025/2620, 2025/2621 and 2026/1740; Commission CBAM Guidance Nos. 2 and 3 (14 August 2026); quarterly CBAM certificate prices (Q1–Q3 2026); IPCC 2006 Guidelines Vol. 2. Full list with links in `app/cbam/data/knowledge.md`.

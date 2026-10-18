@@ -301,7 +301,8 @@ function renderOrigins(run) {
   const me = run.result.see;
   const home = (run.profile && run.profile.country) || "";
   const max = Math.max(...rows.map((r) => r.default_2026), me) * 1.05;
-  const all = [...rows.map((r) => ({ label: r.country, v: r.default_2026, home: r.country === home })), { label: "You", v: me, me: true }]
+  const show = (c) => (c === "Viet Nam" ? "Vietnam" : c);   // the EU lists use "Viet Nam"
+  const all = [...rows.map((r) => ({ label: show(r.country), v: r.default_2026, home: r.country === home })), { label: "You", v: me, me: true }]
     .sort((a, b) => a.v - b.v);
   const tag = (r) => (r.me ? '<i class="o-tag me">your actual data</i>' : r.home ? '<i class="o-tag home">your default today</i>' : "");
   $("#origins").innerHTML = all.map((r) => `<div class="origin ${r.me ? "me" : r.home ? "home" : ""}"><span>${esc(r.label)}${tag(r)}</span><span class="bar-o"><span style="width:${(r.v / max) * 100}%"></span></span><span>${num(r.v, 2)}</span></div>`).join("");
