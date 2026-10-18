@@ -24,7 +24,7 @@
 /* ---------- Stage ---------- */
 .stage3d { position: relative; z-index: 1; background: transparent; }
 
-.hero { min-height: 100vh; min-height: 100svh; text-align: center; padding: clamp(56px, 11vh, 120px) 22px 0; position: relative; }
+.hero { min-height: calc(100vh - 52px); min-height: calc(100svh - 52px); text-align: center; padding: clamp(56px, 11vh, 120px) 22px 0; position: relative; }
 .hero-eyebrow { font-size: clamp(19px, 2vw, 24px); font-weight: 600; color: #F5F5F7; margin: 0 0 10px; letter-spacing: .004em; }
 .hero h1 { font-size: clamp(48px, 8.4vw, 104px); font-weight: 700; line-height: 1.02; letter-spacing: -.035em; margin: 0 auto 18px; max-width: 12em; }
 .hero-sub { font-size: clamp(19px, 2.1vw, 28px); line-height: 1.2; font-weight: 500; color: #A1A1A6; letter-spacing: .004em; margin: 0 auto; max-width: 30em; }
@@ -48,7 +48,13 @@
 
 /* bento */
 .bento { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
-.tile { background: #F5F5F7; border-radius: 28px; padding: clamp(28px, 3.4vw, 44px); min-height: 280px; display: flex; flex-direction: column; justify-content: flex-end; }
+.t-bars { margin-top: auto; padding-top: 22px; display: flex; align-items: flex-end; gap: 10px; height: 118px; }
+.t-bars span { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; position: relative; }
+.t-bars span::before { content: ""; display: block; height: var(--h); flex: none; border-radius: 8px 8px 3px 3px; background: linear-gradient(180deg, #FF8A4C, #E8590C); opacity: .35; order: 2; }
+.t-bars span:last-child::before { opacity: 1; }
+.t-bars b { order: 1; font-size: 13px; font-weight: 600; color: #1D1D1F; margin-bottom: 4px; }
+.t-bars i { order: 3; font-style: normal; font-size: 12px; color: #6E6E73; margin-top: 6px; }
+.tile { background: #F5F5F7; border-radius: 28px; padding: clamp(28px, 3.4vw, 44px); min-height: 280px; display: flex; flex-direction: column; justify-content: flex-start; }
 .t-wide { grid-column: span 2; }
 .t-dark { background: #000; color: #F5F5F7; }
 .t-proof { background: linear-gradient(135deg, #E6FAF0 0%, #F5F5F7 70%); }
@@ -56,7 +62,8 @@
 .t-dark .t-k, .t-dark .t-b { color: #A1A1A6; }
 .t-big { font-size: clamp(36px, 4.6vw, 60px); font-weight: 700; letter-spacing: -.035em; line-height: 1.02; margin: 0 0 12px; }
 .t-proof .t-big { color: #0B7A52; }
-.t-nowrap { white-space: nowrap; font-size: clamp(30px, 3vw, 40px); }
+.tile { container-type: inline-size; }
+.t-nowrap { white-space: nowrap; font-size: clamp(26px, 15cqi, 44px); }
 .t-arrow { color: #FF6A2B; margin: 0 .12em; font-weight: 500; }
 .t-b { font-size: 17px; line-height: 1.45; color: #6E6E73; margin: 0; max-width: 34em; }
 

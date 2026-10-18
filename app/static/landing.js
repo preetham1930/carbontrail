@@ -119,6 +119,12 @@ function startScene(renderer) {
   anchor.add(tilt); tilt.add(spin); scene.add(anchor);
   const parts = buildBolt();
   parts.forEach((p) => tilt.add(p.group));
+  const ctas = $(".hero-ctas", hero), note = $(".hero-note", hero);
+  const MAX_PX = 620;                         // the bolt's longest side at most, in CSS pixels
+  // the bolt's extent in its lying pose at scale 1 (padded for the slow spin), used to fit it to the free space
+  tilt.rotation.set(0.25, 0, -1.22);
+  const bb = new THREE.Box3().setFromObject(anchor), bc = bb.getCenter(new THREE.Vector3()), bs = bb.getSize(new THREE.Vector3());
+  const EXT = { w: bs.x * 1.08, h: bs.y * 1.12, cx: bc.x, cy: bc.y };
 
   let px = 0, py = 0, tx = 0, ty = 0;
   addEventListener("pointermove", (e) => { tx = e.clientX / innerWidth - 0.5; ty = e.clientY / innerHeight - 0.5; }, { passive: true });
@@ -144,11 +150,16 @@ function startScene(renderer) {
     cur.heroK += (S.heroK - cur.heroK) * f;
     const h = cur.heroK, mobile = small();
 
-    /* a product shot lying under the hero text; it turns a little as the page scrolls */
-    anchor.position.set(0, mobile ? -1.75 : -1.45, 0);
-    camera.setViewOffset(innerWidth, innerHeight, 0, -S.shift, innerWidth, innerHeight);
-    anchor.scale.setScalar(mobile ? 0.55 : 0.82);
-    camera.position.z = 10;
+    /* a product shot lying in the free space between the hero buttons and the note under them.
+       Sized in CSS pixels, so it follows browser zoom and never overlaps the text. */
+    const W = innerWidth, H = innerHeight;
+    const wpp = (2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) / H;   // world units per CSS px
+    const top = ctas.getBoundingClientRect().bottom + 18;
+    const bottom = (note ? note.getBoundingClientRect().top : hero.getBoundingClientRect().bottom) - 14;
+    const room = Math.max(60, bottom - top);
+    const sc = Math.max(0.05, Math.min((0.86 * W * wpp) / EXT.w, (room * wpp) / EXT.h, (MAX_PX * wpp) / EXT.w));
+    anchor.scale.setScalar(sc);
+    anchor.position.set(-EXT.cx * sc, (H / 2 - (top + bottom) / 2) * wpp - EXT.cy * sc, 0);
     px += (tx - px) * 0.05; py += (ty - py) * 0.05;
     tilt.rotation.set(0.25 + py * 0.12, px * 0.25, -1.22);
     const spinY = time * 0.35 + h * Math.PI * 0.8;

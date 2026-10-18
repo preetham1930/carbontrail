@@ -250,6 +250,9 @@ function renderHeader(r) {
   $("#split").innerHTML = `<div class="s-prec" style="width:${pPrec}%" title="Purchased wire rod">Wire rod ${pPrec.toFixed(0)}%</div><div class="s-fuel" style="width:${pFuel}%" title="Fuel burned in the furnace">${pFuel < 20 && innerWidth < 620 ? "" : "Furnace fuel "}${pFuel.toFixed(0)}%</div>`;
 }
 
+const SHORT = { "731815": "bolts", "731816": "nuts" };
+const shortName = (g) => SHORT[String(g.cn).replace(/\s/g, "").slice(0, 6)] || String(g.description || "goods").split(/[ ,]/)[0].toLowerCase();
+
 function drawRuler(r, scen) {
   const main = [...r.goods].sort((a, b) => b.export_eu_t - a.export_eu_t)[0];
   const def = main?.default_marked;
@@ -261,7 +264,7 @@ function drawRuler(r, scen) {
   const edge = (v) => (v / max > 0.8 ? " edge-r" : v / max < 0.12 ? " edge-l" : "");
   html += `<div class="mark actual${edge(r.see)}" style="left:${pos(r.see)}"><b>Your data ${num(r.see, 2)}</b><i></i></div>`;
   const close = def != null && Math.abs(def - r.see) / max < 0.16;
-  if (def != null) html += close ? `<div class="mark default below${edge(def)}" style="left:${pos(def)}"><i></i><b>EU default, ${esc(main.description.split(" ")[0].toLowerCase())} ${num(def, 2)}</b></div>` : `<div class="mark default${edge(def)}" style="left:${pos(def)}"><b>EU default, ${esc(main.description.split(" ")[0].toLowerCase())} ${num(def, 2)}</b><i></i></div>`;
+  if (def != null) html += close ? `<div class="mark default below${edge(def)}" style="left:${pos(def)}"><i></i><b>EU default, ${esc(shortName(main))} ${num(def, 2)}</b></div>` : `<div class="mark default${edge(def)}" style="left:${pos(def)}"><b>EU default, ${esc(shortName(main))} ${num(def, 2)}</b><i></i></div>`;
   if (scen) html += `<div class="mark scen ${close ? "" : "below"}${edge(scen.see)}" style="left:${pos(scen.see)}"><i></i><b>What if ${num(scen.see, 2)}</b></div>`;
   $("#ruler").innerHTML = html;
 }

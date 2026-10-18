@@ -241,7 +241,7 @@ def normalise(docs: list[tuple[dict, DocumentExtraction]], profile: dict) -> Nor
             notes.append({"doc": "-", "note": f"{cn} is not a CBAM good; excluded."})
             continue
         exp = exports_eu.get(cn, {"t": 0.0, "ev": []})
-        goods.append(GoodInput(cn=cn, description=_clean_desc(p["desc"]), production_t=round(p["t"], 6), export_eu_t=round(exp["t"], 6), evidence=p["ev"] + exp["ev"]))
+        goods.append(GoodInput(cn=cn, description=_good_name(cn, p["desc"]), production_t=round(p["t"], 6), export_eu_t=round(exp["t"], 6), evidence=p["ev"] + exp["ev"]))
     for cn in exports_eu:
         if cn not in production:
             notes.append({"doc": "-", "note": f"EU exports of {cn} found but no production of {cn} in the period."})
@@ -287,6 +287,14 @@ def normalise(docs: list[tuple[dict, DocumentExtraction]], profile: dict) -> Nor
 _MONTHS = r"(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*"
 _PERIOD_RE = re.compile(rf"\s*[\(\[]?\s*\b{_MONTHS}\b[\s\-'/,.]*\d{{0,4}}\s*[\)\]]?", re.I)
 _CN_RE = re.compile(r"\s*\(?\b(?:CN|HS)?\s*\d{4}\s?\d{2}(?:\s?\d{2})?\b\)?", re.I)
+
+
+def _good_name(cn: str, desc: str) -> str:
+    """The official CN description when we know the code (e.g. 'Threaded screws and bolts, of iron or steel'),
+    else the cleaned label from the document."""
+    from .cbam.engine import REF
+    entry = REF.get("product_defaults", {}).get(normalise_cn(cn).replace(" ", "")[:6])
+    return entry["description"] if isinstance(entry, dict) and entry.get("description") else _clean_desc(desc)
 
 
 def _clean_desc(text: str) -> str:

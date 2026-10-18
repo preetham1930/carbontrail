@@ -152,10 +152,14 @@ function init() {
 
   /* scenery: a few warehouses and container stacks near both ports */
   [[-20, -10, 7, 3, 6], [-12, -14, 5, 2.4, 5], [20 + 26 - 8, -12, 6, 2.8, 6], [64, -14, 8, 3.2, 7]].forEach(([x, z, w, h, d]) => box(w, h, d, M.clayMid, x, h / 2, z));
-  [[-14, -5], [-16, -5.2], [34, -6], [36.5, -6]].forEach(([x, z], i) => {
+  // two stacks side by side at each port, with a gap between them, so every container reads as its own box
+  [[-15, -5], [-15, -6.5], [35, -6], [35, -7.5]].forEach(([x, z], i) => {
     for (let t = 0; t < 2; t++) {
-      const m = new THREE.MeshStandardMaterial({ color: otherColors[(i + t) % otherColors.length], map: ribs, roughness: 0.7 });
-      box(4.8, 1.3, 1.3, m, x, 0.65 + t * 1.3, z - t * 0.02);
+      const col = otherColors[(i * 2 + t) % otherColors.length];
+      const side = new THREE.MeshStandardMaterial({ color: col, map: ribs, roughness: 0.7 });
+      const end = new THREE.MeshStandardMaterial({ color: new THREE.Color(col).multiplyScalar(0.78), roughness: 0.75 });
+      const c = box(4.8, 1.26, 1.26, side, x, 0.63 + t * 1.3, z);
+      c.material = [end, end, side, side, side, side];
     }
   });
 
@@ -381,9 +385,12 @@ function init() {
     const legM = M.clayMid;
     [[-1.7, -1.6], [1.7, -1.6], [-1.7, 1.2], [1.7, 1.2]].forEach(([dx, dz]) => box(0.35, 8.6, 0.35, legM, dx, 4.3, dz, g));
     box(3.8, 0.35, 0.35, legM, 0, 3.2, -1.6, g); box(3.8, 0.35, 0.35, legM, 0, 3.2, 1.2, g);
-    box(0.5, 0.55, 15, M.clay, -0.9, 8.75, 2.5, g); box(0.5, 0.55, 15, M.clay, 0.9, 8.75, 2.5, g);
-    box(2.3, 1.6, 2, M.clay, 0, 9.6, -3.2, g);
-    const trolley = box(2.3, 0.45, 1.2, M.clayDark, 0, 8.3, 0, g);
+    // portal frame on top of the legs: cross beams and side girders that carry the boom
+    box(3.9, 0.5, 0.5, legM, 0, 8.55, -1.6, g); box(3.9, 0.5, 0.5, legM, 0, 8.55, 1.2, g);
+    box(0.4, 0.5, 3.3, legM, -1.7, 8.55, -0.2, g); box(0.4, 0.5, 3.3, legM, 1.7, 8.55, -0.2, g);
+    box(0.5, 0.55, 15, M.clay, -0.9, 9.05, 2.5, g); box(0.5, 0.55, 15, M.clay, 0.9, 9.05, 2.5, g);
+    box(2.3, 1.6, 2, M.clay, 0, 10.1, -3.2, g);
+    const trolley = box(2.3, 0.45, 1.2, M.clayDark, 0, 8.55, 0, g);
     const cable = box(0.06, 1, 0.06, M.ink, 0, 7, 0, g); cable.castShadow = false;
     const spreader = box(4.9, 0.16, 1.4, M.ink, 0, 2.4, 0, g);
     scene.add(g);
@@ -392,7 +399,7 @@ function init() {
         const z = c ? c.z : restZ ?? 0;
         const hookY = c ? c.y + 0.73 : 7.2;
         trolley.position.z = z; spreader.position.set(0, hookY, z);
-        const len = 8.1 - hookY; cable.scale.y = Math.max(0.05, len); cable.position.set(0, hookY + len / 2, z);
+        const len = 8.33 - hookY; cable.scale.y = Math.max(0.05, len); cable.position.set(0, hookY + len / 2, z);
       },
     };
   }

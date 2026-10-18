@@ -98,10 +98,13 @@ def run_checks(norm: Normalized, profile: dict) -> list[dict]:
             add("fuel_use_unknown", "medium", "Fuel use not stated",
                 f"Invoice line {f.evidence} does not say what the fuel was burned in. Treated as furnace fuel (conservative).",
                 evidence=f.evidence, action="Confirm whether it fired the furnace, a DG set or vehicles.")
-        if f.use == "electricity_generation":
-            add("dg_excluded", "info", "DG set diesel treated as an electricity emission",
-                "Diesel burned in the generator produces electricity. For iron & steel goods only direct emissions count, so it is excluded from the SEE.",
-                evidence=f.evidence)
+
+    dg = [e for f in ci.fuels if f.use == "electricity_generation" for e in f.evidence]
+    if dg:
+        add("dg_excluded", "info", "DG set diesel treated as an electricity emission",
+            f"Diesel burned in the generator produces electricity ({len(dg)} delivery line{'s' if len(dg) != 1 else ''}). "
+            "For iron & steel goods only direct emissions count, so it is excluded from the SEE.",
+            evidence=dg)
 
     for eid in norm.low_confidence:
         ev = norm.evidence[eid]

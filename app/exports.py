@@ -64,6 +64,8 @@ def data_pack_xlsx(run) -> bytes:
     ]
     for a, b in rows:
         ws.append([a, b])
+        if isinstance(b, float):
+            ws.cell(row=ws.max_row, column=2).number_format = "#,##0.00" if "EUR" in a else "#,##0.000#"
     ws["A1"].font = Font(bold=True, size=14, color=GREEN)
     ws.column_dimensions["A"].width = 42
     ws.column_dimensions["B"].width = 90
@@ -86,7 +88,7 @@ def data_pack_xlsx(run) -> bytes:
            [[x["description"], x["cn"], x["supplier"], round(x["consumed_t"], 3), x["see"], x["basis"], x["default_see"], round(x["ee_t"], 3),
              ", ".join(x["evidence"] + x["see_evidence"])] for x in r["precursors"]])
     _sheet(wb, "D_Processes_Goods",
-           ["CN", "Description", "Aggregated category", "Production (t)", "EU exports (t)", "SEE (tCO2e/t)", "EU default incl. mark-up", "Gross exposure actual (EUR)", "Gross exposure default (EUR)"],
+           ["CN", "Description", "Aggregated category", "Production (t)", "EU exports (t)", "SEE (tCO2e/t)", "EU default incl. mark-up", "Gross CBAM cost, actual data (EUR)", "Gross CBAM cost, EU defaults (EUR)"],
            [[g["cn"], g["description"], g["aggregated_category"], round(g["production_t"], 3), round(g["export_eu_t"], 3), round(g["see"], 4),
              None if g["default_marked"] is None else round(g["default_marked"], 4), round(g["gross_cost_actual_eur"], 2),
              None if g["gross_cost_default_eur"] is None else round(g["gross_cost_default_eur"], 2)] for g in r["goods"]])
@@ -140,7 +142,7 @@ def evidence_pdf(run) -> bytes:
     for s in r["steps"]:
         S.append(KeepTogether([Paragraph(f"<b>{s['title']}</b> — <font face='Courier'>{s['formula']}</font>", body),
                                Paragraph(s["working"], small),
-                               Paragraph(f"Rule: {s.get('rule', '')}. Evidence: {', '.join(s.get('evidence', [])) or '—'}"
+                               Paragraph(f"Rule: {s.get('rule', '').rstrip('.')}. Evidence: {', '.join(s.get('evidence', [])) or '—'}"
                                          + (f". Note: {s['note']}" if s.get("note") else ""), small), Spacer(1, 5)]))
     S += [PageBreak(), Paragraph("Evidence register", h2),
           Paragraph("Every quantity used above is linked to the exact words on the source document.", small), Spacer(1, 4),
