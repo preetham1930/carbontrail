@@ -161,6 +161,11 @@ async def _intake_one(run: Run, doc: Doc, sem: asyncio.Semaphore) -> None:
             raw = out["state"].get("extraction") or parse_json(out["text"])
             doc.extraction = DocumentExtraction.model_validate(raw)
             doc.source = "gemini"
+            if not doc.extraction.is_source_record and config.ALLOW_SAMPLE_REPLAY:
+                g = _golden(doc)    # a bundled demo document is always a record: never let a wrong verdict drop it
+                if g is not None:
+                    doc.extraction, doc.source = g, "replayed"
+                    doc.error = "Gemini judged this bundled sample as not a record; replayed its stored extraction."
         except Exception as e:  # noqa: BLE001
             log.exception("intake failed for %s", doc.name)
             g = _golden(doc) if config.ALLOW_SAMPLE_REPLAY else None
