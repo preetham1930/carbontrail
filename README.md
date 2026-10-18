@@ -2,7 +2,7 @@
 
 ![CarbonTrail: Paper in. Proof out.](docs/banner.jpg)
 
-**Paper in. Proof out.** CarbonTrail turns a small steel manufacturer's electricity bills, fuel invoices, purchase statements and handwritten production registers into EU CBAM embedded-emissions data that an accredited verifier can trace back to the source page.
+**Paper in. Proof out.** CarbonTrail turns a small Asian steel manufacturer's electricity bills, fuel invoices, purchase statements and handwritten production registers into EU CBAM embedded-emissions data that an accredited verifier can trace back to the source page.
 
 Built by **Team Verdant** for the Google Cloud AI Builder Cup 2026 (JAPAC) · Track: **Manufacturing: Intelligent Operations & Industrial Efficiency**
 
@@ -14,7 +14,7 @@ Built by **Team Verdant** for the Google Cloud AI Builder Cup 2026 (JAPAC) · Tr
 
 Since **1 January 2026**, EU importers of iron & steel, aluminium, cement and fertilisers pay for the carbon embedded in what they buy (Regulation (EU) 2023/956, definitive period). The importer can only use the exporter's own figure if the exporter supplies installation-level data calculated with the EU method (Implementing Regulation (EU) 2025/2547) and verified by an accredited verifier. Otherwise, the importer must use the EU **default value plus a mark-up** of 10% in 2026, 20% in 2027 and 30% from 2028 (IR (EU) 2025/2621).
 
-For a fastener maker in Ludhiana, Rajkot or Bekasi, that data lives on paper: photographed LPG invoices, a mill's statement of supplies, a production register written in Hindi and English. Their EU buyers increasingly move to suppliers who can produce the numbers. Fastmarkets estimates India alone will bear about 18% of all CBAM costs.
+The rule is European, but the cost lands on Asia's exporters: India, China, Viet Nam, Indonesia, Korea, Japan, Taiwan and Thailand all ship steel to the EU. For a fastener maker in Ludhiana, Rajkot or Bekasi, the data the EU method needs lives on paper: photographed LPG invoices, a mill's statement of supplies, a production register written in Hindi and English. Their EU buyers increasingly move to suppliers who can produce the numbers. Fastmarkets estimates India alone will bear about 18% of all CBAM costs.
 
 ## What CarbonTrail does
 
