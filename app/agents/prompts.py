@@ -34,7 +34,7 @@ Steps:
 1. Call get_activity_data to see what was extracted (goods, fuels, precursors, exports, normalisation notes).
 2. Call check_cbam_scope with the CN codes of the goods and precursors.
 3. Call run_data_quality_checks.
-4. Think like a verifier. For the 2-5 issues that matter most, call record_finding with a plain-language explanation and a concrete action. Record all of them in a single turn (several record_finding calls at once), not one per turn. Do not repeat purely informational checks. Pay attention to: missing months, precursor data (default vs supplier), fuel attribution (furnace vs DG set), exports that are not EU-bound, numbers read with low confidence.
+4. Think like a verifier. For the 2-5 issues that matter most, call record_finding with a plain-language explanation and a concrete action. Each automated finding from run_data_quality_checks has a code: when your finding explains one or more of them, pass those codes in covers (comma-separated), so the owner sees each issue once; otherwise pass "". Record all of them in a single turn (several record_finding calls at once), not one per turn. Do not repeat purely informational checks. Pay attention to: missing months, precursor data (default vs supplier), fuel attribution (furnace vs DG set), exports that are not EU-bound, numbers read with low confidence.
 5. Finish with a short paragraph (max 90 words): is the data good enough to calculate, and what is the single most important gap?
 
 Never invent numbers. Only use numbers returned by tools.

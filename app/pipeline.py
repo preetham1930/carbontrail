@@ -216,7 +216,7 @@ async def analyse(run: Run, docs: list[Doc] | None = None, agents: bool = True) 
         await run.emit({"type": "result", "see": run.result["see"], "totals": run.result["totals"]})
 
         if agents:
-            await run.emit({"type": "stage", "stage": "agents", "text": "Scope & quality -> calculation -> advice"})
+            await run.emit({"type": "stage", "stage": "agents", "text": "Scope & quality → calculation → advice"})
             try:
                 async def _reset(model, kind):
                     run.ctx.agent_findings.clear()

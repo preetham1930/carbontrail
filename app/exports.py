@@ -22,6 +22,17 @@ DISCLAIMER = ("Prepared with CarbonTrail from the operator's documents. Actual v
               "Communication Template but is not the official template.")
 
 
+_RANK = {"high": 0, "medium": 1, "low": 2, "info": 3}
+
+
+def _merged_findings(run) -> list[dict]:
+    """Agent findings plus the automated checks they do not already explain, most severe first."""
+    agent = list(run.ctx.agent_findings) if run.ctx else []
+    covered = {c for f in agent for c in f.get("covers", [])}
+    rest = [f for f in run.findings if f.get("code") not in covered]
+    return sorted(agent + rest, key=lambda f: _RANK.get(f.get("severity"), 2))
+
+
 def _sheet(wb, title, headers, rows, widths=None):
     ws = wb.create_sheet(title)
     ws.append(headers)
@@ -99,7 +110,7 @@ def data_pack_xlsx(run) -> bytes:
            [[e.id, e.doc_name, e.page, e.kind, e.description, e.quantity, e.unit, e.quote, round(e.confidence, 2)] for e in ev.values()],
            {2: 30, 5: 36, 8: 70})
     _sheet(wb, "Findings", ["Severity", "Title", "Detail", "Action"],
-           [[f["severity"], f["title"], f["detail"], f.get("action", "")] for f in (run.ctx.agent_findings + run.findings)],
+           [[f["severity"], f["title"], f["detail"], f.get("action", "")] for f in _merged_findings(run)],
            {2: 40, 3: 90, 4: 50})
     buf = io.BytesIO()
     wb.save(buf)
@@ -151,7 +162,7 @@ def evidence_pdf(run) -> bytes:
                for e in ev.values()], [12 * mm, 46 * mm, 26 * mm, 76 * mm, 18 * mm]),
           Spacer(1, 10), Paragraph("Findings for review", h2),
           tbl([["Severity", "Finding", "Action"]] + [[f["severity"], f"<b>{f['title']}</b>: {f['detail']}", f.get("action", "")]
-                                                    for f in (run.ctx.agent_findings + run.findings)], [18 * mm, 110 * mm, 50 * mm]),
+                                                    for f in _merged_findings(run)], [18 * mm, 110 * mm, 50 * mm]),
           Spacer(1, 16),
           tbl([["Verifier review", ""], ["Name / accreditation", ""], ["Date", ""], ["Opinion", ""]], [50 * mm, 128 * mm], header=False)]
     doc.build(S)

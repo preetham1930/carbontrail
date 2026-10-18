@@ -46,3 +46,18 @@ def test_bill_issued_after_the_period_still_counts():
     norm = normalise([({"id": "D1", "name": "bill.pdf"}, ex)], PROFILE)
     assert norm.out_of_period == []
     assert norm.calc_input.electricity_mwh == pytest.approx(1.0)
+
+
+def test_agent_finding_merges_with_the_check_it_explains():
+    from app.agents.factory import match_covers
+    auto = [{"code": "electricity_gap", "severity": "low"}, {"code": "precursor_default", "severity": "high"},
+            {"code": "low_confidence", "severity": "medium"}, {"code": "dg_excluded", "severity": "info"}]
+    # a named code wins; unknown codes are ignored
+    assert match_covers({"title": "Anything"}, "precursor_default, bogus", auto, set()) == ["precursor_default"]
+    # no code named: the title decides (titles Gemini wrote on a real run)
+    assert match_covers({"title": "Precursor Supplier Emissions Data (SEE) Missing for Wire Rod"}, "", auto, set()) == ["precursor_default"]
+    assert match_covers({"title": "Low-Confidence Reading on May 2026 Bolt Production Figure"}, "", auto, set()) == ["low_confidence"]
+    assert match_covers({"title": "Missing Electricity Bills for April and May 2026"}, "", auto, set()) == ["electricity_gap"]
+    # a check already merged into another finding is not taken twice; an unrelated finding merges with nothing
+    assert match_covers({"title": "Wire rod again"}, "", auto, {"precursor_default"}) == []
+    assert match_covers({"title": "Export prices look low"}, "", auto, set()) == []

@@ -293,7 +293,10 @@ function renderSteps(r) {
 
 function renderFindings(run) {
   const agentF = (run.agent_findings || []).map((f) => ({ ...f, agent: true }));
-  const all = [...agentF, ...run.findings.filter((f) => f.severity !== "info" || ["non_eu_export", "dg_excluded"].includes(f.code))];
+  const covered = new Set(agentF.flatMap((f) => f.covers || []));      // an agent finding that explains a check replaces it
+  const rank = { high: 0, medium: 1, low: 2, info: 3 };
+  const all = [...agentF, ...run.findings.filter((f) => !covered.has(f.code) && (f.severity !== "info" || ["non_eu_export", "dg_excluded"].includes(f.code)))]
+    .sort((a, b) => (rank[a.severity] ?? 2) - (rank[b.severity] ?? 2));
   $("#find-count").textContent = all.length ? String(all.length) : "";
   $("#find-count").title = `${all.length} finding${all.length === 1 ? "" : "s"}, ${all.filter((f) => f.severity === "high").length} high`;
   $("#findings").innerHTML = all.map((f) => `<li class="finding ${f.severity}"><h4><span class="sev ${f.severity}">${f.severity}</span>${f.agent ? '<span class="sev agent">agent review</span>' : ""}${esc(f.title)}</h4>

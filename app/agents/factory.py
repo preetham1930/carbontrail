@@ -68,6 +68,39 @@ def _r(x: Optional[float], n: int = 3) -> Optional[float]:
     return None if x is None else round(float(x), n)
 
 
+# Words that tie an agent's finding to the automated check it explains, used when the agent names no code.
+_COVER_WORDS = {
+    "precursor_default": ("wire rod", "precursor", "supplier emission", "supplier data", "default value"),
+    "precursor_unverified": ("unverified", "not verified"),
+    "production_gap": ("production data missing", "missing production", "production missing", "production gap"),
+    "fuel_gap": ("fuel invoice", "lpg invoice", "fuel gap", "missing fuel"),
+    "electricity_gap": ("electricity",),
+    "low_confidence": ("confidence", "hard to read", "legib", "corrected", "unclear", "handwrit"),
+    "yield_impossible": ("yield", "material balance"),
+    "yield_low": ("yield", "material balance", "scrap"),
+    "export_gt_production": ("exports exceed", "more than produced", "export volume"),
+    "fuel_use_unknown": ("fuel use", "attribution", "unknown use"),
+    "dg_excluded": ("dg set", "generator", "diesel"),
+    "non_eu_export": ("united kingdom", "non-eu", "outside eu", "outside the eu", "uk export", "uk shipment"),
+    "out_of_period": ("outside the reporting period", "out of period", "dated outside"),
+    "not_a_record": ("set aside", "not a record", "not a business record", "mock"),
+}
+
+
+def match_covers(finding: dict, covers: str, automated: list[dict], taken: set[str]) -> list[str]:
+    """Which automated findings an agent finding explains: the codes it names, else the one its title points at."""
+    known = {a.get("code") for a in automated} - taken
+    named = [c.strip() for c in (covers or "").replace(";", ",").split(",") if c.strip() in known]
+    if named:
+        return list(dict.fromkeys(named))
+    title = (finding.get("title") or "").lower()
+    for a in automated:  # checks are ordered by importance; the first one the title points at wins
+        code = a.get("code")
+        if code in known and any(w in title for w in _COVER_WORDS.get(code, ())):
+            return [code]
+    return []
+
+
 def build_analysis_pipeline(ctx: "AnalysisContext", model=None) -> SequentialAgent:
     """Three agents in sequence, sharing tools bound to this run's context."""
     m = model or MODEL_OVERRIDE or config.MODEL_REASON
@@ -94,11 +127,18 @@ def build_analysis_pipeline(ctx: "AnalysisContext", model=None) -> SequentialAge
         """Run deterministic reconciliation checks (period coverage, precursor balance, yield, exports vs production, fuel attribution, low-confidence readings)."""
         return {"findings": ctx.findings}
 
-    def record_finding(severity: str, title: str, explanation: str, recommended_action: str) -> dict:
-        """Record a finding for the owner and the verifier. severity is one of: high, medium, low."""
-        ctx.agent_findings.append({"severity": severity if severity in ("high", "medium", "low") else "medium",
-                                   "title": title, "detail": explanation, "action": recommended_action})
-        return {"recorded": True, "count": len(ctx.agent_findings)}
+    def record_finding(severity: str, title: str, explanation: str, recommended_action: str, covers: str) -> dict:
+        """Record a finding for the owner and the verifier. severity is one of: high, medium, low.
+        covers: comma-separated codes of the automated findings (from run_data_quality_checks) this finding explains, or "" if none.
+        A covered automated finding is shown once, merged into yours, with its evidence."""
+        f = {"severity": severity if severity in ("high", "medium", "low") else "medium",
+             "title": title, "detail": explanation, "action": recommended_action}
+        taken = {c for a in ctx.agent_findings for c in a.get("covers", [])}
+        codes = match_covers(f, covers, ctx.findings, taken)
+        f["covers"] = codes
+        f["evidence"] = [e for a in ctx.findings if a.get("code") in codes for e in a.get("evidence", [])]
+        ctx.agent_findings.append(f)
+        return {"recorded": True, "count": len(ctx.agent_findings), "merged_with": codes}
 
     def calculate_embedded_emissions() -> dict:
         """Calculate specific embedded emissions (SEE) with the EU CBAM method. Returns SEE, totals, the share from precursors and fuels, and excluded sources."""

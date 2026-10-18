@@ -1,7 +1,18 @@
 """Deterministic data-quality checks that the analyst agent reasons over."""
 from __future__ import annotations
 
+import re
+
 from .normalize import Normalized, _month_keys
+
+
+def _material(desc: str) -> str:
+    """'Wire rod issued' -> 'wire rod': the material, without the ledger verb."""
+    d = re.sub(r"\b(issued|purchased|received|supplied|consumed|bought|delivered)\b", "", desc or "", flags=re.I)
+    d = re.sub(r"\s+", " ", d).strip(" -,.")
+    if not d:
+        return "the precursor"
+    return d[:1].lower() + d[1:] if d[1:2].islower() else d
 
 
 def run_checks(norm: Normalized, profile: dict) -> list[dict]:
@@ -71,7 +82,7 @@ def run_checks(norm: Normalized, profile: dict) -> list[dict]:
             else:
                 add("yield_ok", "info", "Material yield is plausible", f"Yield {yld:.1%} (fasteners out / wire rod in).", evidence=p.evidence)
         if p.see_actual is None:
-            add("precursor_default", "high", f"Using the EU default value for {p.description}",
+            add("precursor_default", "high", f"Using the EU default value for {_material(p.description)}",
                 f"No supplier emissions data for {p.cn}. The precursor usually makes up most of a fastener's footprint, "
                 "so the default value inflates your SEE.",
                 evidence=p.evidence, action="Ask the wire rod supplier for installation-level SEE data (CarbonTrail can draft the request).")

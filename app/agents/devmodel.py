@@ -21,7 +21,7 @@ SCRIPT = {
     "scope_quality_agent": [("get_activity_data", {}), ("check_cbam_scope", {"cn_codes": ["731815", "731816", "7213"]}),
                             ("run_data_quality_checks", {}),
                             ("record_finding", {"severity": "high", "title": "Wire rod on default values",
-                                                "explanation": "No supplier data.", "recommended_action": "Ask the mill."})],
+                                                "explanation": "No supplier data.", "recommended_action": "Ask the mill.", "covers": "precursor_default"})],
     "calculation_agent": [("calculate_embedded_emissions", {}), ("compare_with_eu_defaults", {})],
     "advisor_agent": [("compare_with_eu_defaults", {}), ("simulate_scenario", {"precursor_see": 0.9}),
                       ("simulate_scenario", {"fuel_switch_to": "natural_gas"})],
