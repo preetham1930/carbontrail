@@ -6,7 +6,7 @@
 
 Built by **Team Verdant** for the Google Cloud AI Builder Cup 2026 (JAPAC) · Track: **Manufacturing: Intelligent Operations & Industrial Efficiency**
 
-> **Live demo:** https://carbontrail-629415533355.asia-south1.run.app · **Demo video:** https://youtu.be/LLIsBoH1UNg · **Deck:** `docs/CarbonTrail-deck.pdf`
+> **Live demo:** https://carbontrail-629415533355.asia-south1.run.app · **Demo video:** https://youtu.be/LLIsBoH1UNg · **Deck:** docs/CarbonTrail-deck.pdf
 
 ---
 
